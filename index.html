@@ -1,0 +1,1621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shree Binayak Computer Learning Centre — HTML &amp; CSS IDE</title>
+<style>
+:root{
+  --bg:#0f172a; --panel:#111827; --panel2:#1e293b; --border:#2d3b52;
+  --text:#e5e7eb; --muted:#94a3b8; --accent:#2563eb; --accent2:#22c55e;
+  --danger:#ef4444; --code-bg:#0b1220;
+  --z-editor:1; --z-header:100; --z-menu:1000; --z-floating:5000; --z-modal:9000; --z-toast:10000;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%;overflow:hidden}
+body{display:flex;flex-direction:column;min-height:0}
+body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+body.modal-open{overflow:hidden}
+[data-theme="light"]{--bg:#f3f4f6;--panel:#ffffff;--panel2:#f8fafc;--border:#e2e8f0;--text:#0f172a;--muted:#475569;--code-bg:#f8fafc}
+header{position:relative;flex-shrink:0;z-index:var(--z-header);background:var(--panel);border-bottom:1px solid var(--border);padding:.5rem 1rem;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+.quickicons{display:flex;gap:.3rem}
+.menubar{position:relative;flex-shrink:0;z-index:var(--z-menu);display:flex;align-items:center;gap:.1rem;background:var(--panel2);border-bottom:1px solid var(--border);padding:.25rem .75rem;overflow-x:auto;white-space:nowrap}
+.menu{position:relative;flex-shrink:0}
+.menu-btn{background:none;border:none;color:var(--muted);padding:.4rem .7rem;font-size:.8rem;font-weight:600;cursor:pointer;border-radius:6px;white-space:nowrap}
+.menu-btn:hover{color:var(--text);background:var(--panel)}
+.menu.open .menu-btn{color:var(--accent);background:var(--panel)}
+.menu-dd{display:none;position:fixed;background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.35);min-width:220px;z-index:var(--z-menu);padding:.35rem;max-height:70vh;overflow-y:auto}
+.menu.open .menu-dd{display:block}
+.menu-dd.wide{min-width:320px}
+.menu-item{display:block;width:100%;text-align:left;background:none;border:none;color:var(--text);padding:.45rem .6rem;font-size:.8rem;border-radius:6px;cursor:pointer}
+.menu-item:hover{background:var(--panel2);color:var(--accent)}
+.menu-sep{height:1px;background:var(--border);margin:.3rem 0}
+.run-prominent{background:var(--accent2);color:#06210f;border:none;border-radius:8px;padding:.4rem .9rem;font-weight:700;font-size:.8rem;cursor:pointer;flex-shrink:0;margin-left:.3rem}
+.quickbar{display:flex;gap:.3rem;padding:.35rem .6rem;background:var(--panel2);border-bottom:1px solid var(--border);flex-shrink:0;min-width:0;overflow-x:auto;overflow-y:hidden;white-space:nowrap}
+.qbtn{background:var(--code-bg);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:.3rem .55rem;font-size:.75rem;cursor:pointer;flex-shrink:0}
+.qbtn:hover{border-color:var(--accent);color:var(--accent)}
+.toast{position:fixed;left:50%;bottom:calc(1.2rem + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--panel);border:1px solid var(--accent2);color:var(--text);padding:.55rem 1rem;border-radius:8px;font-size:.8rem;z-index:var(--z-toast);opacity:0;transition:all .25s;box-shadow:0 6px 18px rgba(0,0,0,.3)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#cpModal .modal{padding:0;overflow:hidden}
+#cpInput{width:100%;border:none;background:var(--panel2);color:var(--text);padding:.8rem 1rem;font-size:.95rem;outline:none;border-bottom:1px solid var(--border)}
+#cpList{max-height:55vh;overflow-y:auto;padding:.4rem}
+.cp-item{padding:.5rem .8rem;border-radius:6px;cursor:pointer;font-size:.85rem;display:flex;justify-content:space-between}
+.cp-item.sel,.cp-item:hover{background:var(--accent);color:#fff}
+.health-ok{color:var(--accent2)}.health-warn{color:#eab308}.health-err{color:var(--danger)}
+.health-item{padding:.35rem 0;border-bottom:1px solid var(--border);font-size:.85rem;cursor:pointer}
+@media (max-width:720px){.menu-dd.wide{min-width:260px}}
+.brand{display:flex;align-items:center;gap:.6rem;margin-right:auto;min-width:0}
+.logo{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid #d4af37;box-shadow:0 0 0 1px var(--border)}
+.brand h1{font-size:.95rem;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand p{font-size:.7rem;margin:0;color:var(--muted)}
+button.btn{background:var(--panel2);color:var(--text);border:1px solid var(--border);padding:.45rem .7rem;border-radius:8px;font-size:.8rem;cursor:pointer;display:flex;align-items:center;gap:.35rem;white-space:nowrap}
+button.btn:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button.good{background:var(--accent2);border-color:var(--accent2);color:#06210f}
+button.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+select,input[type=text],input[type=password]{background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:.4rem .5rem;font-size:.8rem}
+.toolbar{display:flex;gap:.4rem;flex-wrap:wrap}
+main{display:flex;flex:1;min-height:0;overflow:hidden}
+.panel{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;background:var(--panel)}
+.panel-head{display:flex;align-items:center;gap:.4rem;padding:.4rem .6rem;border-bottom:1px solid var(--border);background:var(--panel2);flex-shrink:0;min-width:0;overflow-x:auto;overflow-y:hidden}
+.tab{padding:.3rem .7rem;border-radius:6px;font-size:.78rem;cursor:pointer;color:var(--muted)}
+.tab.active{background:var(--accent);color:#fff}
+.editor-wrap{flex:1;display:flex;overflow:hidden;position:relative;min-height:0;min-width:0}
+.gutter{background:var(--code-bg);color:#5b6b85;text-align:right;padding:.75rem .5rem;font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;white-space:pre;user-select:none;overflow:hidden;flex-shrink:0}
+.attr-suggest{display:none;position:fixed;flex-wrap:wrap;gap:.3rem;padding:.35rem .5rem;background:var(--panel2);border:1px solid var(--border);border-radius:0 0 8px 8px;z-index:var(--z-menu)}
+.attr-suggest.show{display:flex}
+.attr-chip{background:var(--code-bg);border:1px solid var(--border);color:var(--accent);font:11px ui-monospace,monospace;padding:.15rem .45rem;border-radius:5px;cursor:pointer}
+.attr-chip:hover{border-color:var(--accent)}
+.attr-suggest::before{content:"↑↓ move · Tab ⇥ fill";font-size:.65rem;color:var(--muted);align-self:center;margin-right:.2rem;white-space:nowrap}
+.grp{display:flex;gap:.3rem;padding-right:.5rem;border-right:1px solid var(--border)}
+.grp:last-child{border-right:none;padding-right:0}
+.toolbar{align-items:center}
+@media (max-width:1180px){.toolbar{flex-basis:100%;flex-wrap:nowrap;overflow-x:auto;padding-bottom:.25rem}}
+.tab{padding:.32rem .8rem;border-radius:8px;font-size:.78rem;font-weight:600;border:1px solid transparent}
+.tab:hover{color:var(--text);border-color:var(--border)}
+.tab.active:hover{color:#fff}
+#colorRow,#insCats,#insItems{display:flex;flex-wrap:wrap}
+.ins-row{display:flex;gap:.3rem;overflow-x:auto;white-space:nowrap;align-items:center;scrollbar-width:thin}
+.ins-cat{background:var(--code-bg);color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:.2rem .65rem;font-size:.72rem;cursor:pointer;flex-shrink:0}
+.ins-cat.on{background:var(--accent2);border-color:var(--accent2);color:#06210f;font-weight:700}
+.ins-item{background:var(--code-bg);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:.22rem .55rem;font-size:.74rem;cursor:pointer;flex-shrink:0}
+.ins-item:hover{border-color:var(--accent);color:var(--accent)}
+
+input[type=color]{width:38px;height:32px;border:1px solid var(--border);border-radius:8px;background:none;padding:0;cursor:pointer;flex-shrink:0}
+#colorHexInput{font:12px ui-monospace,Menlo,Consolas,monospace;text-transform:uppercase}
+#swatches{display:flex;gap:.25rem;flex-shrink:0}
+.swatch{width:20px;height:20px;border-radius:5px;border:1px solid var(--border);cursor:pointer;flex-shrink:0}
+.attr-chip.sel{background:var(--accent);border-color:var(--accent);color:#fff}
+#splash{position:fixed;inset:0;z-index:99999;background:radial-gradient(circle at center,#12305f,#050b1a);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;transition:opacity .7s;text-align:center;padding:1rem;color:#fff}
+#splash.hide{opacity:0;pointer-events:none}
+#splashLogo{width:min(58vw,260px);height:min(58vw,260px);border-radius:50%;border:4px solid #d4af37;object-fit:cover;animation:logoGrow 3.2s ease-out forwards}
+@keyframes logoGrow{from{transform:scale(.25);opacity:0}to{transform:scale(1);opacity:1}}
+#splash h1{font-size:clamp(1rem,4.5vw,1.6rem);margin:0;opacity:0;animation:fadeIn 1s 1.8s forwards}
+#splash p{margin:0;font-size:.8rem;color:#94a3b8;opacity:0;animation:fadeIn 1s 2.2s forwards}
+@keyframes fadeIn{to{opacity:1}}
+textarea.mi{width:100%;background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:.45rem;font-size:.8rem;margin-bottom:.4rem;font-family:ui-monospace,Menlo,Consolas,monospace}
+textarea.code{flex:1;min-height:0;min-width:0;resize:none;border:none;outline:none;background:var(--code-bg);color:var(--text);font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;padding:.75rem;white-space:pre;overflow:auto}
+#resizer{width:6px;cursor:col-resize;background:var(--border)}
+#resizer:hover{background:var(--accent)}
+iframe#preview{flex:1;min-height:0;border:none;background:#fff}
+.mobile-toggle{display:none}
+footer{text-align:center;font-size:.72rem;color:var(--muted);padding:.6rem;border-top:1px solid var(--border);background:var(--panel)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:var(--z-modal);padding:1rem;overflow:auto}
+.modal-bg.show{display:flex}
+.modal{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:1.1rem;max-width:520px;width:100%;max-height:calc(100vh - 2rem);overflow:auto}
+.modal h2{margin-top:0;font-size:1rem}
+.proj-card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:.7rem;margin-bottom:.6rem}
+.proj-card .row{display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap}
+.proj-card .actions{display:flex;gap:.3rem;flex-wrap:wrap}
+.proj-card .actions button{font-size:.72rem;padding:.3rem .5rem}
+.chip{font-size:.68rem;background:var(--border);padding:.15rem .5rem;border-radius:999px;color:var(--muted)}
+.assign-item{border:1px solid var(--border);border-radius:8px;padding:.5rem .6rem;margin-bottom:.4rem;font-size:.85rem}
+.check-ok{color:var(--accent2)}
+.check-bad{color:var(--danger)}
+#roboFab{position:fixed;right:1.1rem;bottom:calc(1.1rem + env(safe-area-inset-bottom,0px));width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;font-size:1.5rem;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.35);z-index:var(--z-floating)}
+#roboModal{z-index:var(--z-toast)}
+.robo-msg{margin-bottom:.55rem;padding:.5rem .65rem;border-radius:10px;line-height:1.4;white-space:pre-wrap}
+.robo-msg.user{background:var(--accent);color:#fff;margin-left:20%}
+.robo-msg.bot{background:var(--panel);border:1px solid var(--border);margin-right:20%}
+.robo-msg.bot.thinking{color:var(--muted);font-style:italic}
+.robo-msg pre{background:var(--code-bg);border:1px solid var(--border);border-radius:6px;padding:.5rem;overflow-x:auto;font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;margin:.4rem 0}
+.robo-msg .code-actions{display:flex;gap:.4rem;margin:.3rem 0}
+.robo-msg .code-actions button{font-size:.7rem;padding:.25rem .5rem}
+@media (max-width:820px){
+  main{flex-direction:column}
+  #resizer{display:none}
+  .panel{width:100% !important;flex:1;min-height:0}
+  .mobile-toggle{display:flex;gap:.4rem;padding:.5rem;background:var(--panel2);flex-shrink:0}
+  .mobile-toggle button{flex:1}
+  #codePanel.hide,#previewPanel.hide{display:none}
+}
+</style>
+</head>
+<body>
+
+<div id="splash" title="Tap to skip">
+  <img id="splashLogo" alt="Shree Binayak Computer Learning Centre">
+  <h1>Welcome to Shree Binayak Computer Learning Centre</h1>
+  <p>Loading your HTML &amp; CSS Learning IDE…</p>
+</div>
+
+<header>
+  <div class="brand">
+    <img class="logo" src="data:image/jpeg;base64,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" alt="Shree Binayak Computer Learning Centre logo">
+    <div>
+      <h1>Shree Binayak Computer Learning Centre</h1>
+      <p>HTML &amp; CSS Learning IDE · <span id="studentLabel">Guest Student</span></p>
+    </div>
+  </div>
+  <div class="quickicons">
+    <button class="btn" onclick="toggleTheme()" title="Theme">🌓</button>
+    <button class="btn" onclick="toggleFullscreen()" title="Fullscreen">⛶</button>
+  </div>
+</header>
+
+<nav class="menubar" id="menubar">
+  <div class="menu" data-m="file"><button class="menu-btn" onclick="toggleMenu('file')">📁 File</button>
+    <div class="menu-dd">
+      <button class="menu-item" onclick="cmdNewProject()">New Project</button>
+      <button class="menu-item" onclick="cmdOpenProjects()">Open Project</button>
+      <button class="menu-item" onclick="saveProject();closeMenus()">Save</button>
+      <button class="menu-item" onclick="cmdSaveAs()">Save As</button>
+      <div class="menu-sep"></div>
+      <button class="menu-item" onclick="cmdOpenProjects()">Duplicate Project</button>
+      <button class="menu-item" onclick="cmdOpenProjects()">Rename Project</button>
+      <button class="menu-item" onclick="cmdOpenProjects()">Delete Project</button>
+      <div class="menu-sep"></div>
+      <button class="menu-item" onclick="downloadHTML();closeMenus()">Export HTML</button>
+      <button class="menu-item" onclick="downloadPair();closeMenus()">Export HTML + CSS + JS</button>
+      <button class="menu-item" onclick="$('importProjectFile').click()">Import Project</button>
+      <input type="file" id="importProjectFile" accept=".json" style="display:none" onchange="importProject(this)">
+      <div class="menu-sep"></div>
+      <button class="menu-item" onclick="restorePrev();closeMenus()">Restore Previous Session</button>
+    </div>
+  </div>
+  <div class="menu" data-m="run"><button class="menu-btn" onclick="toggleMenu('run')">▶ Run</button>
+    <div class="menu-dd">
+      <button class="menu-item" onclick="runPreview();closeMenus()">Run / Refresh Preview</button>
+      <button class="menu-item" onclick="openInBrowser();closeMenus()">Open in Browser</button>
+      <button class="menu-item" onclick="openInBrowser();closeMenus()">Preview in New Window</button>
+      <button class="menu-item" id="autoRunItem" onclick="toggleAutoRun()">Auto Run: ON</button>
+      <button class="menu-item" onclick="stopPreview();closeMenus()">Stop Preview</button>
+    </div>
+  </div>
+  <button class="run-prominent" onclick="runPreview()">▶ RUN</button>
+  <div class="menu" data-m="insert"><button class="menu-btn" onclick="toggleMenu('insert')">🧩 Insert</button>
+    <div class="menu-dd wide">
+      <div class="ins-row" id="colorRow">
+        <input type="color" id="colorPick" value="#2563eb" title="Pick a colour">
+        <input type="text" id="colorHexInput" value="#2563eb" maxlength="7" title="Type a hex code" style="width:70px">
+        <span id="swatches"></span>
+      </div>
+      <div class="ins-row" style="margin:.3rem 0">
+        <button class="btn" onclick="insertColor()">Insert code</button>
+        <button class="btn" onclick="applyColor('text')">A Text</button>
+        <button class="btn" onclick="applyColor('bg')">▧ Background</button>
+        <button class="btn" onclick="applyColor('border')">▢ Border</button>
+      </div>
+      <div class="menu-sep"></div>
+      <div class="ins-row" id="insCats" style="display:contents"></div>
+      <div class="ins-row" id="insItems" style="margin-top:.3rem"></div>
+    </div>
+  </div>
+  <div class="menu" data-m="learn"><button class="menu-btn" onclick="toggleMenu('learn')">🎯 Learn</button>
+    <div class="menu-dd">
+      <button class="menu-item" onclick="openModal('practiceModal');closeMenus()">Practice Zone</button>
+      <button class="menu-item" onclick="buildAssignment();openModal('assignModal');closeMenus()">Assignments</button>
+      <button class="menu-item" onclick="cmdSurpriseMe()">Challenges (Surprise Me)</button>
+      <button class="menu-item" onclick="roboOpenWithPrompt('Teach me the basics of HTML in 4 short points.')">HTML Lessons</button>
+      <button class="menu-item" onclick="roboOpenWithPrompt('Teach me the basics of CSS in 4 short points.')">CSS Lessons</button>
+      <button class="menu-item" onclick="roboOpenWithPrompt('Teach me the basics of JavaScript in 4 short points.')">JavaScript Lessons</button>
+      <button class="menu-item" onclick="cmdMyProgress()">My Progress</button>
+    </div>
+  </div>
+  <div class="menu" data-m="tools"><button class="menu-btn" onclick="toggleMenu('tools')">🛠 Tools</button>
+    <div class="menu-dd">
+      <button class="menu-item" onclick="openModal('imagesModal');renderImages();closeMenus()">Image Library</button>
+      <button class="menu-item" onclick="toggleMenu('insert')">Colour Picker</button>
+      <button class="menu-item" onclick="formatCode();closeMenus()">Code Formatter</button>
+      <button class="menu-item" onclick="cmdCheckCode();closeMenus()">HTML Validator</button>
+      <button class="menu-item" onclick="cmdCheckCode();closeMenus()">CSS Validator</button>
+      <button class="menu-item" onclick="cmdCheckCode();closeMenus()">JavaScript Checker</button>
+      <button class="menu-item" onclick="cmdFindReplace();closeMenus()">Find &amp; Replace</button>
+      <button class="menu-item" onclick="cmdCharCount();closeMenus()">Character Counter</button>
+      <button class="menu-item" onclick="cmdCodeStats();closeMenus()">Code Statistics</button>
+    </div>
+  </div>
+  <div class="menu" data-m="ai"><button class="menu-btn" onclick="toggleMenu('ai')">🤖 AI</button>
+    <div class="menu-dd">
+      <button class="menu-item" onclick="openRobo();closeMenus()">Ask Robo</button>
+      <button class="menu-item" onclick="askRoboQuick('Explain what my current HTML and CSS code does, in simple terms.');openRobo();closeMenus()">Explain My Code</button>
+      <button class="menu-item" onclick="askRoboQuick('Check my code for mistakes');openRobo();closeMenus()">Find My Mistake</button>
+      <button class="menu-item" onclick="askRoboQuick('Give me one small hint to improve what I have, without giving the full answer.');openRobo();closeMenus()">Give Me a Hint</button>
+      <button class="menu-item" onclick="askRoboQuick('Suggest one specific way I could improve my current code.');openRobo();closeMenus()">Improve My Code</button>
+      <button class="menu-item" onclick="cmdSurpriseMe()">Generate Practice Task</button>
+      <button class="menu-item" onclick="cmdGenerateAssignment()">Generate Assignment</button>
+    </div>
+  </div>
+  <div class="menu" data-m="account"><button class="menu-btn" onclick="toggleMenu('account')">👤 Account</button>
+    <div class="menu-dd" id="accountMenu"></div>
+  </div>
+  <div class="menu" data-m="settings"><button class="menu-btn" onclick="toggleMenu('settings')">⚙ Settings</button>
+    <div class="menu-dd">
+      <button class="menu-item" onclick="toggleTheme();closeMenus()">Dark/Light Theme</button>
+      <button class="menu-item" onclick="cmdFontSize()">Editor Font Size</button>
+      <button class="menu-item" onclick="toggleWordWrap()">Word Wrap</button>
+      <button class="menu-item" id="autoSaveItem" onclick="toggleAutoSave()">Auto Save: ON</button>
+      <button class="menu-item" id="autoRunItem2" onclick="toggleAutoRun()">Auto Run: ON</button>
+      <button class="menu-item" onclick="toggleFullscreen();closeMenus()">Fullscreen</button>
+      <button class="menu-item" onclick="cmdShortcuts()">Keyboard Shortcuts</button>
+      <button class="menu-item" onclick="cmdResetSettings()">Reset Settings</button>
+    </div>
+  </div>
+</nav>
+
+<button id="roboFab" onclick="openRobo()" title="Ask Robo for a hint">🤖</button>
+
+<div class="mobile-toggle">
+  <button class="btn primary" onclick="showMobile('code')">CODE</button>
+  <button class="btn" onclick="showMobile('preview')">PREVIEW</button>
+</div>
+
+<main>
+  <div class="panel" id="codePanel" style="width:50%">
+    <div class="panel-head">
+      <div class="tab active" id="tabHtml" onclick="switchTab('html')">🧱 HTML</div>
+      <div class="tab" id="tabCss" onclick="switchTab('css')">🎨 CSS</div>
+      <div class="tab" id="tabJs" onclick="switchTab('js')">⚡ JavaScript</div>
+      <span style="margin-left:auto" class="chip" id="saveStatus">Not saved</span>
+    </div>
+    <div class="quickbar">
+      <button class="qbtn" onclick="saveProject()">💾 Save</button>
+      <button class="qbtn" onclick="runPreview()">▶ Run</button>
+      <button class="qbtn" onclick="doUndo()">↶ Undo</button>
+      <button class="qbtn" onclick="doRedo()">↷ Redo</button>
+      <button class="qbtn" onclick="cmdFindReplace()">🔍 Find</button>
+      <button class="qbtn" onclick="formatCode()" id="qFormat">🎨 Format HTML</button>
+      <button class="qbtn" onclick="openRobo()">🤖 Robo</button>
+      <button class="qbtn" onclick="copyCurrent()">📋 Copy</button>
+      <button class="qbtn" onclick="downloadHTML()">⇩ Download</button>
+    </div>
+    <div class="attr-suggest" id="attrSuggest"></div>
+    <div class="editor-wrap">
+      <div class="gutter" id="gutter">1</div>
+      <textarea class="code" id="editorHtml" spellcheck="false"></textarea>
+      <textarea class="code" id="editorCss" spellcheck="false" style="display:none"></textarea>
+      <textarea class="code" id="editorJs" spellcheck="false" style="display:none"></textarea>
+    </div>
+  </div>
+  <div id="resizer"></div>
+  <div class="panel" id="previewPanel" style="width:50%">
+    <div class="panel-head">
+      <strong style="font-size:.8rem">Live Preview</strong>
+      <button class="btn" style="margin-left:auto" onclick="runPreview()">↻ Refresh</button>
+    </div>
+    <iframe id="preview" sandbox="allow-scripts"></iframe>
+  </div>
+</main>
+
+<footer>© 2026 Shree Binayak Computer Learning Centre · Dalai Street, Borigumma · 9776167601 / 8599827117 · shreebinayakcmpcentre@gmail.com</footer>
+
+<!-- Projects Modal -->
+<div class="modal-bg" id="projectsModal">
+  <div class="modal">
+    <h2>My Projects</h2>
+    <div id="projectsList"></div>
+    <button class="btn" onclick="restorePrev()">↩ Restore last unsaved session</button>
+    <button class="btn" onclick="closeModal('projectsModal')">Close</button>
+  </div>
+</div>
+
+<!-- Practice Modal -->
+<div class="modal-bg" id="practiceModal">
+  <div class="modal">
+    <h2>Practice Zone</h2>
+    <input type="text" id="practiceSearch" placeholder="Search a tag or topic..." oninput="buildPractice()" style="width:100%;margin-bottom:.6rem">
+    <div id="practiceAdmin"></div>
+    <div id="practiceList"></div>
+    <button class="btn" onclick="closeModal('practiceModal')">Close</button>
+  </div>
+</div>
+
+<!-- Robo AI Chat Modal -->
+<div class="modal-bg" id="roboModal">
+  <div class="modal" style="display:flex;flex-direction:column;max-height:85vh">
+    <h2>🤖 Robo — HTML &amp; CSS Helper</h2>
+    <p style="font-size:.75rem;color:var(--muted);margin-top:-.4rem">Robo looks at your current code and answers your question with a hint — it won't just hand you the full solution.</p>
+    <div id="roboChat" style="flex:1;overflow:auto;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:.6rem;margin:.5rem 0;min-height:180px;font-size:.85rem"></div>
+    <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.4rem">
+      <button class="btn" onclick="askRoboQuick('Why is my CSS not applying?')">CSS not applying?</button>
+      <button class="btn" onclick="askRoboQuick('How do I center a div?')">Center a div</button>
+      <button class="btn" onclick="askRoboQuick('Check my code for mistakes')">Check my code</button>
+    </div>
+    <div style="display:flex;gap:.4rem">
+      <input type="text" id="roboInput" placeholder="Ask about your HTML/CSS..." style="flex:1" onkeydown="if(event.key==='Enter')askRobo()">
+      <button class="btn primary" onclick="askRobo()">Send</button>
+      <button class="btn" onclick="closeModal('roboModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Images Modal -->
+<div class="modal-bg" id="imagesModal"><div class="modal">
+  <h2>🖼 My Images</h2>
+  <p style="font-size:.78rem;color:var(--muted)">Upload a picture, then tap Insert. In your code the picture is used by its name, e.g. &lt;img src="photo.jpg"&gt;.</p>
+  <div id="imagesList"></div>
+  <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+    <button class="btn primary" onclick="$('imageFile').click()">⇧ Upload image</button>
+    <input type="file" id="imageFile" accept="image/*" multiple style="display:none" onchange="addImages(this)">
+    <button class="btn" onclick="closeModal('imagesModal')">Close</button>
+  </div>
+</div></div>
+
+<!-- Info Modal (Progress / Code Health / Stats / Shortcuts) -->
+<div class="modal-bg" id="infoModal"><div class="modal">
+  <h2 id="infoTitle">Info</h2>
+  <div id="infoBody" style="font-size:.85rem"></div>
+  <button class="btn" style="margin-top:.6rem" onclick="closeModal('infoModal')">Close</button>
+</div></div>
+
+<!-- Command Palette -->
+<div class="modal-bg" id="cpModal"><div class="modal" style="max-width:480px">
+  <input type="text" id="cpInput" placeholder="🔍 Search commands..." oninput="cpFilter()" onkeydown="cpKey(event)">
+  <div id="cpList"></div>
+</div></div>
+
+<!-- Assignment Modal -->
+<div class="modal-bg" id="assignModal"><div class="modal">
+  <h2>Assignments</h2>
+  <select id="assignSelect" onchange="showAssignment()" style="width:100%;margin-bottom:.5rem"></select>
+  <h3 id="assignTitle" style="margin:.3rem 0;font-size:.95rem"></h3>
+  <ol id="assignInstructions" style="font-size:.85rem;color:var(--muted)"></ol>
+  <div id="assignResults"></div>
+  <div style="display:flex;gap:.5rem;margin-top:.6rem;flex-wrap:wrap">
+    <button class="btn primary" onclick="checkAssignment()">✔ Check My Work</button>
+    <button class="btn good" onclick="submitAssignment()">📤 Submit</button>
+    <button class="btn" onclick="$('importFile').click()">⇧ Import assignments file</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importAssign(this)">
+    <button class="btn" onclick="closeModal('assignModal')">Close</button>
+  </div>
+</div></div>
+
+<!-- Admin Modal -->
+<div class="modal-bg" id="adminModal"><div class="modal" style="max-width:640px">
+  <h2>🛠 Teacher / Admin Panel</h2>
+  <input type="text" id="aTitle" placeholder="Assignment title" style="width:100%;margin-bottom:.4rem">
+  <textarea class="mi" id="aInstr" rows="4" placeholder="Instructions (one per line)"></textarea>
+  <textarea class="mi" id="aRules" rows="5" placeholder="Auto-check rules, one per line: type|value|label&#10;html|h1|H1 heading found&#10;css|color:blue|Blue heading&#10;js|addEventListener|Uses events&#10;text|Hello|Page says Hello"></textarea>
+  <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.6rem">
+    <button class="btn good" onclick="saveAssignment()">Save assignment</button>
+    <button class="btn" onclick="exportAssign()">⇩ Export assignments</button>
+    <button class="btn" onclick="exportResults()">⇩ Export results (CSV)</button>
+    <button class="btn" onclick="changePin()">🔑 Change PIN</button>
+  </div>
+  <div id="adminAssignments"></div>
+  <h3 style="font-size:.9rem">Submissions</h3>
+  <div id="adminSubs"></div>
+  <button class="btn" onclick="closeModal('adminModal')">Close</button>
+</div></div>
+
+<!-- Login Modal -->
+<div class="modal-bg" id="loginModal"><div class="modal">
+  <h2>Login</h2>
+  <select id="loginRole" onchange="$('loginPin').style.display=this.value==='admin'?'block':'none'" style="width:100%;margin-bottom:.4rem"><option value="student">Student</option><option value="admin">Teacher / Admin</option></select>
+  <input type="text" id="loginName" placeholder="Your name" style="width:100%;margin-bottom:.4rem">
+  <input type="password" id="loginPin" placeholder="Teacher PIN" style="display:none;width:100%;margin-bottom:.4rem">
+  <p style="font-size:.72rem;color:var(--muted)">Students: just enter your name. Teachers: choose Teacher / Admin and enter your PIN.</p>
+  <button class="btn primary" onclick="doLogin()">Login</button>
+  <button class="btn" onclick="closeModal('loginModal')">Close</button>
+</div></div>
+
+<script>
+const DEFAULT_HTML = `<h1>Welcome to Shree Binayak Computer Learning Centre</h1>
+<p>Learn HTML and CSS by creating websites.</p>
+<button>Learn More</button>`;
+const DEFAULT_CSS = `body {
+  font-family: Arial, sans-serif;
+  padding: 40px;
+  text-align: center;
+}
+h1 { color: #2563eb; }
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}`;
+
+const elHtml = document.getElementById('editorHtml');
+const elCss = document.getElementById('editorCss');
+const elJs = document.getElementById('editorJs');
+const $ = id => document.getElementById(id);
+let currentTab = 'html';
+let currentProjectId = null;
+let debounceTimer = null;
+
+function safeGet(key, fallback){
+  try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+  catch(e){ return fallback; }
+}
+function safeSet(key, val){
+  try{ localStorage.setItem(key, JSON.stringify(val)); return true; }
+  catch(e){ return false; }
+}
+
+function init(){
+  // Always start with the Welcome sample; keep the previous unsaved session so it can be restored
+  const lh = safeGet('binayak_last_html', null);
+  if(lh !== null && lh !== DEFAULT_HTML) safeSet('binayak_prev', {html:lh, css:safeGet('binayak_last_css',''), js:safeGet('binayak_last_js','')});
+  elHtml.value = DEFAULT_HTML; elCss.value = DEFAULT_CSS; elJs.value = '';
+  updateGutter();
+  runPreview();
+  buildPractice();
+  buildAssignment();
+  applySession();
+  renderInsert();
+  applyFontSize(safeGet('binayak_fontsize',13));
+  if(wordWrapOn) document.querySelectorAll('textarea.code').forEach(el=>el.style.whiteSpace='pre-wrap');
+  const arLabel='Auto Run: '+(autoRunOn?'ON':'OFF'); if($('autoRunItem'))$('autoRunItem').textContent=arLabel; if($('autoRunItem2'))$('autoRunItem2').textContent=arLabel;
+  if($('autoSaveItem')) $('autoSaveItem').textContent='Auto Save: '+(autoSaveOn?'ON':'OFF');
+  setInterval(()=>{ if(autoSaveOn && currentProjectId){ saveProject(); } }, 30000);
+}
+
+const EDS = {html:elHtml, css:elCss, js:elJs};
+const editorScroll = {html:0, css:0, js:0};
+function switchTab(t){
+  if(EDS[currentTab]) editorScroll[currentTab] = EDS[currentTab].scrollTop;
+  currentTab = t;
+  for(const k in EDS){
+    $('tab'+k[0].toUpperCase()+k.slice(1)).classList.toggle('active', k===t);
+    EDS[k].style.display = k===t ? 'block':'none';
+  }
+  EDS[t].scrollTop = editorScroll[t];
+  $('gutter').scrollTop = editorScroll[t];
+  updateGutter(); updateAttrSuggestions();
+  const lbl={html:'HTML',css:'CSS',js:'JavaScript'}[t];
+  if($('qFormat')) $('qFormat').textContent='🎨 Format '+lbl;
+}
+
+function updateGutter(){
+  const el = EDS[currentTab];
+  const lines = el.value.split('\n').length;
+  let s='';
+  for(let i=1;i<=lines;i++) s+=i+'\n';
+  document.getElementById('gutter').textContent = s;
+}
+
+[elHtml, elCss, elJs].forEach(el=>{
+  el.addEventListener('input', ()=>{
+    updateGutter();
+    const st=document.getElementById('saveStatus'); st.textContent='● Unsaved changes'; st.dataset.dirty='1';
+    if(typeof autoRunOn==='undefined' || autoRunOn){ clearTimeout(debounceTimer); debounceTimer = setTimeout(runPreview, 400); }
+  });
+  el.addEventListener('scroll', ()=>{
+    document.getElementById('gutter').scrollTop = el.scrollTop;
+  });
+  el.addEventListener('keydown', e=>{
+    if((e.key==='ArrowDown'||e.key==='ArrowUp') && $('attrSuggest').classList.contains('show')){ e.preventDefault(); moveSuggest(e.key==='ArrowDown'?1:-1); return; }
+    if(e.key==='Escape' && $('attrSuggest').classList.contains('show')){ $('attrSuggest').classList.remove('show'); return; }
+    if(e.key==='Tab'){ e.preventDefault(); if(!e.shiftKey && tabAutofill()) return;
+      const s=el.selectionStart, en=el.selectionEnd;
+      el.value = el.value.slice(0,s)+'  '+el.value.slice(en);
+      el.selectionStart=el.selectionEnd=s+2;
+    }
+  });
+});
+
+// ===== Dropdown menu bar =====
+function closeMenus(){ document.querySelectorAll('.menu.open').forEach(m=>m.classList.remove('open')); }
+function toggleMenu(name){
+  const m=document.querySelector(`.menu[data-m="${name}"]`), was=m.classList.contains('open');
+  closeMenus();
+  if(!was){
+    m.classList.add('open');
+    if(name==='account') renderAccountMenu();
+    if(name==='insert') renderInsert();
+    positionDropdown(m.querySelector('.menu-btn'), m.querySelector('.menu-dd'));
+  }
+}
+// Fixed-position dropdowns need explicit coordinates (nothing can clip them, but nothing positions them for us either)
+function positionDropdown(btn, dd){
+  const r=btn.getBoundingClientRect();
+  dd.style.top=r.bottom+'px'; dd.style.left=r.left+'px';
+  requestAnimationFrame(()=>{
+    const w=dd.offsetWidth, vw=window.innerWidth;
+    if(r.left+w>vw-8) dd.style.left=Math.max(8,vw-w-8)+'px';
+    const h=dd.offsetHeight, vh=window.innerHeight;
+    if(r.bottom+h>vh-8) dd.style.top=Math.max(8,r.top-h)+'px';
+  });
+}
+document.addEventListener('click', e=>{
+  // Use composedPath(), not e.target: a menu item's onclick can rebuild its own list (e.g. switching an
+  // Insert category) which detaches the clicked element from the page before this listener runs, making
+  // e.target.closest() wrongly report "clicked outside" and close the menu that should stay open.
+  const path = e.composedPath ? e.composedPath() : [e.target];
+  const insideMenu = path.some(el => el.classList && el.classList.contains('menu'));
+  if(!insideMenu) closeMenus();
+});
+function renderAccountMenu(){
+  const loggedIn = session.role!=='student' || session.name!=='Guest Student';
+  let html = `<button class="menu-item" onclick="cmdMyProgress()">Student Profile</button>
+    <button class="menu-item" onclick="cmdOpenProjects()">My Projects</button>
+    <button class="menu-item" onclick="cmdMyProgress()">My Progress</button>
+    <button class="menu-item" onclick="openModal('loginModal');closeMenus()">${loggedIn?'Switch User / Login':'Login'}</button>`;
+  if(loggedIn) html += `<button class="menu-item" onclick="doLogout()">Logout</button>`;
+  if(session.role==='admin'){
+    html += `<div class="menu-sep"></div>
+      <button class="menu-item" onclick="openAdmin();closeMenus()">Teacher Dashboard</button>
+      <button class="menu-item" onclick="openAdmin();closeMenus()">Assignments</button>
+      <button class="menu-item" onclick="openAdmin();closeMenus()">Student Submissions</button>
+      <button class="menu-item" onclick="openModal('practiceModal');closeMenus()">Practice Management</button>
+      <button class="menu-item" onclick="exportResults();closeMenus()">Export Results</button>`;
+  }
+  $('accountMenu').innerHTML = html;
+}
+function doLogout(){ session={role:'student',name:'Guest Student'}; safeSet('binayak_session',session); applySession(); closeMenus(); }
+
+// ---- File menu helpers ----
+function cmdNewProject(){ newProject(); closeMenus(); }
+function cmdOpenProjects(){ openModal('projectsModal'); renderProjects(); closeMenus(); }
+function cmdSaveAs(){
+  closeMenus(); const name=prompt('Save as new project name:'); if(!name) return;
+  currentProjectId=null; const old=document.title; saveProjectNamed(name);
+}
+function saveProjectNamed(name){
+  const projects=getProjects(); currentProjectId='p'+Date.now();
+  projects.push({id:currentProjectId,name,html:elHtml.value,css:elCss.value,js:elJs.value,student:session.name,created:new Date().toLocaleString(),updated:new Date().toLocaleString()});
+  safeSet('binayak_projects',projects); markSaved('Saved as '+name);
+}
+function exportProjectJSON(p){ triggerDownload((p.name||'project')+'.json', JSON.stringify(p,null,2)); }
+function importProject(input){
+  const f=input.files[0]; if(!f) return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    try{
+      const p=JSON.parse(rd.result); if(!p.html&&p.html!=='') throw 0;
+      const projects=getProjects(); p.id='p'+Date.now(); p.updated=new Date().toLocaleString();
+      projects.push(p); safeSet('binayak_projects',projects); alert('Project imported: '+(p.name||'Untitled'));
+    }catch(e){ alert('Invalid project file.'); }
+  };
+  rd.readAsText(f); input.value=''; closeMenus();
+}
+
+// ---- Run menu: Auto Run / Stop Preview ----
+let autoRunOn = safeGet('binayak_autorun', true);
+function toggleAutoRun(){
+  autoRunOn = !autoRunOn; safeSet('binayak_autorun', autoRunOn);
+  const label='Auto Run: '+(autoRunOn?'ON':'OFF');
+  if($('autoRunItem')) $('autoRunItem').textContent=label;
+  if($('autoRunItem2')) $('autoRunItem2').textContent=label;
+  closeMenus();
+}
+function stopPreview(){ document.getElementById('preview').srcdoc='<p style="font-family:sans-serif;padding:20px;color:#888">Preview stopped. Click Run to resume.</p>'; }
+
+// ---- Settings: font size, word wrap, auto-save, reset ----
+function cmdFontSize(){
+  closeMenus(); const cur=safeGet('binayak_fontsize',13);
+  const n=prompt('Editor font size in pixels (10-22):', cur); if(!n) return;
+  const v=Math.max(10,Math.min(22,parseInt(n)||13));
+  safeSet('binayak_fontsize',v); applyFontSize(v);
+}
+function applyFontSize(v){ document.querySelectorAll('textarea.code,.gutter').forEach(el=>el.style.fontSize=v+'px'); }
+let wordWrapOn = safeGet('binayak_wrap', false);
+function toggleWordWrap(){
+  wordWrapOn=!wordWrapOn; safeSet('binayak_wrap',wordWrapOn);
+  document.querySelectorAll('textarea.code').forEach(el=>el.style.whiteSpace=wordWrapOn?'pre-wrap':'pre');
+  closeMenus();
+}
+let autoSaveOn = safeGet('binayak_autosave', true);
+let autoSaveTimer=null, lastSavedAt=null;
+function toggleAutoSave(){
+  autoSaveOn=!autoSaveOn; safeSet('binayak_autosave',autoSaveOn);
+  if($('autoSaveItem')) $('autoSaveItem').textContent='Auto Save: '+(autoSaveOn?'ON':'OFF');
+  closeMenus();
+}
+function markSaved(label){ const st=$('saveStatus'); st.textContent=label; delete st.dataset.dirty; lastSavedAt=Date.now(); }
+function tickSaveStatus(){
+  if(!lastSavedAt){ return; }
+  const secs=Math.round((Date.now()-lastSavedAt)/1000);
+  if($('saveStatus') && !$('saveStatus').dataset.dirty) $('saveStatus').textContent='✓ Saved '+secs+'s ago';
+}
+setInterval(tickSaveStatus, 5000);
+function cmdResetSettings(){
+  closeMenus(); if(!confirm('Reset theme, font size, word wrap, auto-save and auto-run to defaults? Your projects and assignments are kept.')) return;
+  ['binayak_fontsize','binayak_wrap','binayak_autosave','binayak_autorun'].forEach(k=>{ try{localStorage.removeItem(k);}catch(e){} });
+  location.reload();
+}
+function cmdShortcuts(){
+  closeMenus();
+  showInfo('⌨ Keyboard Shortcuts', `
+    <div class="health-item">Ctrl+S — Save</div><div class="health-item">Ctrl+N — New Project</div>
+    <div class="health-item">Ctrl+Enter — Run</div><div class="health-item">Ctrl+K or Ctrl+Shift+P — Command Palette</div>
+    <div class="health-item">Ctrl+Z / Ctrl+Y — Undo / Redo</div><div class="health-item">Ctrl+F — Find</div>
+    <div class="health-item">Ctrl+H — Find &amp; Replace</div><div class="health-item">Shift+Alt+F — Format Code</div>
+    <div class="health-item">F11 — Fullscreen</div><div class="health-item">Tab — Accept suggestion</div>`);
+}
+
+// ---- Tools: formatter, validator, find/replace, counters ----
+function showToast(msg){
+  let t=$('toastEl');
+  if(!t){ t=document.createElement('div'); t.id='toastEl'; t.className='toast'; document.body.appendChild(t); }
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2200);
+}
+function formatHTMLStr(src){
+  const tokens=src.replace(/>\s*</g,'>\n<').split('\n'); let depth=0, out=[];
+  const selfClose=SELF_CLOSING;
+  tokens.forEach(line=>{
+    line=line.trim(); if(!line) return;
+    const closing=/^<\//.test(line), tagMatch=line.match(/^<([a-zA-Z0-9]+)/);
+    const selfC = tagMatch && selfClose.includes(tagMatch[1].toLowerCase());
+    const inlineClose = /<\/[a-zA-Z0-9]+>\s*$/.test(line) && !closing;
+    if(closing) depth=Math.max(0,depth-1);
+    out.push('  '.repeat(depth)+line);
+    if(!closing && !selfC && !inlineClose && /^<[a-zA-Z]/.test(line) && !line.endsWith('/>')) depth++;
+  });
+  return out.join('\n');
+}
+function formatCSSStr(src){
+  return src.replace(/\s*{\s*/g,' {\n  ').replace(/;\s*/g,';\n  ').replace(/\s*}\s*/g,'\n}\n').replace(/\n\s*\n/g,'\n').split('\n').map(l=>l.trim()).filter(Boolean).map(l=>l==='}'?l:(l.endsWith('{')?l:'  '+l)).join('\n');
+}
+function formatJSStr(src){
+  return src.split('\n').map(l=>l.trim()).join('\n'); // light touch only — avoids breaking valid code
+}
+function formatCode(){
+  try{
+    if(currentTab==='html') elHtml.value=formatHTMLStr(elHtml.value);
+    else if(currentTab==='css') elCss.value=formatCSSStr(elCss.value);
+    else elJs.value=formatJSStr(elJs.value);
+    updateGutter(); runPreview(); showToast('Code formatted successfully.');
+  }catch(e){ showToast('Could not format — code left unchanged.'); }
+  closeMenus();
+}
+function cmdCheckCode(){
+  const html=elHtml.value, css=elCss.value, js=elJs.value, items=[];
+  const openT=html.match(/<([a-z][a-z0-9]*)(?![^>]*\/>)[^>]*>/gi)||[], closeT=html.match(/<\/([a-z][a-z0-9]*)>/gi)||[];
+  const oc={}, cc={};
+  openT.forEach(t=>{const m=t.match(/<([a-z0-9]+)/i); if(m){const tag=m[1].toLowerCase(); if(!SELF_CLOSING.includes(tag)) oc[tag]=(oc[tag]||0)+1;}});
+  closeT.forEach(t=>{const m=t.match(/<\/([a-z0-9]+)/i); if(m){const tag=m[1].toLowerCase(); cc[tag]=(cc[tag]||0)+1;}});
+  for(const tag in oc) if((cc[tag]||0)<oc[tag]) items.push(['err',`Missing closing &lt;/${tag}&gt; tag.`]);
+  const doc=new DOMParser().parseFromString(html,'text/html');
+  doc.querySelectorAll('img').forEach(im=>{ if(!im.getAttribute('alt')) items.push(['warn','Consider adding alt text to your image.']); });
+  if(doc.querySelector('marquee')) items.push(['warn','&lt;marquee&gt; is old-fashioned — CSS animation is the modern choice.']);
+  const ob=(css.match(/{/g)||[]).length, cb=(css.match(/}/g)||[]).length;
+  if(ob!==cb) items.push(['err',`CSS has ${ob} "{" but ${cb} "}" — check for a missing brace.`]); else if(css.trim()) items.push(['ok','CSS braces look balanced.']);
+  if(css.trim() && !/[;{}]\s*$/.test(css.trim())) items.push(['warn','Last CSS line may be missing a semicolon.']);
+  if(js.trim()){
+    const jo=(js.match(/\(/g)||[]).length, jc=(js.match(/\)/g)||[]).length;
+    if(jo!==jc) items.push(['err','Mismatched parentheses ( ) in your JavaScript.']); else items.push(['ok','JavaScript parentheses look balanced.']);
+  }
+  if(items.every(i=>i[0]==='ok')||!items.length) items.push(['ok','No obvious problems found — nice work!']);
+  const icon={ok:'✓',warn:'⚠',err:'⚠'};
+  showInfo('Code Health', items.map(([k,m])=>`<div class="health-item health-${k}">${icon[k]} ${m}</div>`).join(''));
+}
+function cmdFindReplace(){
+  closeMenus(); const el=EDS[currentTab];
+  const find=prompt('Find:'); if(!find) return;
+  const idx=el.value.indexOf(find);
+  if(idx===-1){ alert('Not found.'); return; }
+  const repl=prompt('Replace with (leave blank to just locate it):','');
+  el.focus(); el.selectionStart=idx; el.selectionEnd=idx+find.length;
+  if(repl){ el.value=el.value.slice(0,idx)+repl+el.value.slice(idx+find.length); el.selectionEnd=idx+repl.length; el.dispatchEvent(new Event('input')); }
+  else el.scrollTop = el.scrollHeight * (idx/el.value.length);
+}
+function cmdCharCount(){
+  closeMenus(); const el=EDS[currentTab];
+  showInfo('Character Counter', `<p>${el.value.length} characters, ${el.value.split(/\s+/).filter(Boolean).length} words, ${el.value.split('\n').length} lines in the ${currentTab.toUpperCase()} editor.</p>`);
+}
+function cmdCodeStats(){
+  closeMenus();
+  const stat=v=>({chars:v.length,lines:v.split('\n').length});
+  const h=stat(elHtml.value), c2=stat(elCss.value), j=stat(elJs.value);
+  showInfo('Code Statistics', `<div class="health-item">HTML: ${h.lines} lines, ${h.chars} characters</div><div class="health-item">CSS: ${c2.lines} lines, ${c2.chars} characters</div><div class="health-item">JavaScript: ${j.lines} lines, ${j.chars} characters</div>`);
+}
+function copyCurrent(){
+  const el=EDS[currentTab];
+  (navigator.clipboard?navigator.clipboard.writeText(el.value):Promise.reject()).then(()=>showToast('Copied '+currentTab.toUpperCase()+' to clipboard.')).catch(()=>{ el.select(); document.execCommand('copy'); showToast('Copied.'); });
+}
+function doUndo(){ try{ document.execCommand('undo'); }catch(e){} }
+function doRedo(){ try{ document.execCommand('redo'); }catch(e){} }
+
+// ---- AI menu helpers ----
+function roboOpenWithPrompt(q){ openRobo(); askRoboQuick(q); closeMenus(); }
+function cmdSurpriseMe(){
+  closeMenus(); const items=practiceItems(); const pick=items[Math.floor(Math.random()*items.length)];
+  elHtml.value=pick.html||''; elCss.value=pick.css||''; elJs.value=pick.js||'';
+  updateGutter(); runPreview();
+  showToast('New challenge loaded: '+pick.name);
+}
+function cmdGenerateAssignment(){
+  closeMenus();
+  if(session.role!=='admin'){ showToast('Ask your teacher to create assignments in Admin → Assignments.'); return; }
+  const pick=EXERCISES[Math.floor(Math.random()*EXERCISES.length)];
+  $('aTitle').value='Recreate: '+pick.name;
+  $('aInstr').value=`Look at the example and recreate it in your own words.\nChange at least one colour.\nAdd one extra element of your own.`;
+  $('aRules').value=`html|${(pick.html.match(/<([a-z0-9]+)/i)||['','div'])[1]}|Uses the right main tag\ntext||Page has some text`;
+  openAdmin();
+  showToast('Draft assignment generated — review it and click Save.');
+}
+
+// ---- My Progress (honest counts, no invented data) ----
+function cmdMyProgress(){
+  closeMenus();
+  const projects=getProjects().filter(p=>p.student===session.name).length;
+  const subs=safeGet('binayak_submissions',[]).filter(s=>s.student===session.name);
+  const done=subs.filter(s=>s.status==='Completed').length;
+  showInfo('📊 My Progress — '+session.name, `
+    <div class="health-item">Projects saved on this computer: ${projects}</div>
+    <div class="health-item">Assignments submitted: ${subs.length}</div>
+    <div class="health-item">Assignments fully completed: ${done}</div>
+    <p style="color:var(--muted);font-size:.75rem;margin-top:.5rem">This is local data from this computer only. A shared, cross-device progress view would need a real backend — ask your teacher if that's planned.</p>`);
+}
+
+// ---- Generic info modal ----
+function showInfo(title, html){ $('infoTitle').textContent=title; $('infoBody').innerHTML=html; openModal('infoModal'); }
+
+// ---- Command palette ----
+const PALETTE_CMDS=[
+  ['New Project',cmdNewProject],['Save Project',()=>{saveProject();closeCP();}],['Run',()=>{runPreview();closeCP();}],
+  ['Open in Browser',()=>{openInBrowser();closeCP();}],['HTML Editor',()=>{switchTab('html');closeCP();}],
+  ['CSS Editor',()=>{switchTab('css');closeCP();}],['JavaScript Editor',()=>{switchTab('js');closeCP();}],
+  ['Practice Zone',()=>{openModal('practiceModal');closeCP();}],['Assignments',()=>{buildAssignment();openModal('assignModal');closeCP();}],
+  ['Ask Robo',()=>{openRobo();closeCP();}],['Format Code',()=>{formatCode();closeCP();}],
+  ['Check Code',()=>{cmdCheckCode();closeCP();}],['Download HTML',()=>{downloadHTML();closeCP();}],
+  ['Toggle Theme',()=>{toggleTheme();closeCP();}],['Fullscreen',()=>{toggleFullscreen();closeCP();}],
+  ['My Progress',cmdMyProgress],['Image Library',()=>{openModal('imagesModal');renderImages();closeCP();}],
+  ['Login',()=>{openModal('loginModal');closeCP();}],['Keyboard Shortcuts',cmdShortcuts]
+];
+let cpSel=0;
+function openCP(){ closeMenus(); $('cpInput').value=''; cpRender(PALETTE_CMDS); openModal('cpModal'); setTimeout(()=>$('cpInput').focus(),50); }
+function closeCP(){ closeModal('cpModal'); }
+function cpRender(list){
+  cpSel=0;
+  $('cpList').innerHTML=list.map(([name],i)=>`<div class="cp-item${i===0?' sel':''}" onclick="(${PALETTE_CMDS.indexOf(list[i])>-1?'PALETTE_CMDS':'[]'}[${PALETTE_CMDS.indexOf(list[i])}][1])()">${name}</div>`).join('');
+}
+function cpFilter(){
+  const q=$('cpInput').value.toLowerCase();
+  cpRender(PALETTE_CMDS.filter(c=>c[0].toLowerCase().includes(q)));
+}
+function cpKey(e){
+  const items=[...document.querySelectorAll('.cp-item')];
+  if(e.key==='ArrowDown'){ e.preventDefault(); items[cpSel]?.classList.remove('sel'); cpSel=Math.min(items.length-1,cpSel+1); items[cpSel]?.classList.add('sel'); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); items[cpSel]?.classList.remove('sel'); cpSel=Math.max(0,cpSel-1); items[cpSel]?.classList.add('sel'); }
+  else if(e.key==='Enter'){ items[cpSel]?.click(); }
+  else if(e.key==='Escape'){ closeCP(); }
+}
+
+// Auto-close HTML tags + attribute suggestions
+const SELF_CLOSING = ['img','br','input','hr','meta','link','source','area','col','embed','wbr'];
+const ATTR_MAP = {
+  a:['href','target','rel'], img:['src','alt','width','height'],
+  input:['type','name','placeholder','value','required'], button:['type','onclick'],
+  form:['action','method'], table:['border','cellpadding','cellspacing'],
+  td:['colspan','rowspan'], th:['colspan','rowspan'], select:['multiple','name'],
+  textarea:['rows','cols','placeholder'], video:['src','controls','autoplay','loop','width'],
+  audio:['src','controls','autoplay'], iframe:['src','width','height','frameborder'],
+  marquee:['behavior','direction','scrollamount','loop'], label:['for'],
+  meta:['name','content','charset'], link:['rel','href']
+};
+const GLOBAL_ATTRS = ['class','id','style','title'];
+function attemptAutoClose(){
+  const pos = elHtml.selectionStart;
+  const text = elHtml.value;
+  const before = text.slice(0,pos);
+  const m = before.match(/<([a-zA-Z][a-zA-Z0-9]*)((?:\s+[^<>]*)?)>$/);
+  if(!m) return;
+  const tag = m[1].toLowerCase();
+  if(SELF_CLOSING.includes(tag) || m[2].trim().endsWith('/')) return;
+  const after = text.slice(pos);
+  if(after.toLowerCase().startsWith('</'+tag+'>')) return;
+  elHtml.value = before + '</'+tag+'>' + after;
+  elHtml.selectionStart = elHtml.selectionEnd = pos;
+}
+function updateHtmlSuggest(){
+  const bar = document.getElementById('attrSuggest');
+  const pos = elHtml.selectionStart;
+  const before = elHtml.value.slice(0,pos);
+  const lastOpen = before.lastIndexOf('<');
+  const lastClose = before.lastIndexOf('>');
+  if(lastOpen === -1 || lastClose > lastOpen){ bar.classList.remove('show'); return; }
+  const segment = before.slice(lastOpen+1);
+  if(/^[a-zA-Z0-9]*$/.test(segment)){
+    const tl = TAGS.filter(t=>t.startsWith(segment.toLowerCase())).slice(0,14);
+    renderChips(bar, tl.map(t=>[`&lt;${t}&gt;`,`insertTag('${t}')`])); return;
+  }
+  const m = segment.match(/^([a-zA-Z][a-zA-Z0-9]*)(\s[^<>]*)?$/);
+  if(!m){ bar.classList.remove('show'); return; }
+  const tag = m[1].toLowerCase();
+  if(/=\s*("[^"]*|'[^']*)?$/.test(segment)){ bar.classList.remove('show'); return; }
+  const partial = ((segment.match(/\s([a-zA-Z-]*)$/)||[])[1]||'').toLowerCase();
+  const used = (m[2]||'').toLowerCase();
+  const list = [...(ATTR_MAP[tag]||[]), ...GLOBAL_ATTRS].filter(a=>a.startsWith(partial) && !used.includes(a+'='));
+  renderChips(bar, list.map(a=>[a,`insertAttr('${a}')`]));
+}
+function insertAttr(name){
+  const pos=elHtml.selectionStart, text=elHtml.value, before=text.slice(0,pos);
+  const m=before.match(/\s([a-zA-Z-]*)$/), partial=m?m[1]:'';
+  const start=pos-partial.length, ins=(m?'':' ')+name+'=""';
+  elHtml.value=text.slice(0,start)+ins+text.slice(pos);
+  elHtml.focus(); elHtml.selectionStart=elHtml.selectionEnd=start+ins.length-1;
+  updateAttrSuggestions();
+}
+// Tab = accept the first (highlighted) suggestion. Returns false when nothing is suggested, so Tab indents as usual.
+function tabAutofill(){
+  const bar=$('attrSuggest');
+  if(!bar.classList.contains('show')||currentTab==='js') return false;
+  const first=bar.querySelector('.attr-chip.sel')||bar.querySelector('.attr-chip'); if(!first) return false;
+  const el=EDS[currentTab];
+  if(currentTab==='html'){
+    const before=elHtml.value.slice(0,elHtml.selectionStart), seg=before.slice(before.lastIndexOf('<')+1);
+    if(/^[a-zA-Z0-9]+$/.test(seg) && first.textContent.replace(/[<>]/g,'')===seg.toLowerCase()){
+      // tag name already complete: Tab finishes the tag and auto-closes it
+      const pos=elHtml.selectionStart;
+      elHtml.value=elHtml.value.slice(0,pos)+'>'+elHtml.value.slice(pos);
+      elHtml.selectionStart=elHtml.selectionEnd=pos+1;
+      attemptAutoClose(); updateAttrSuggestions(); el.dispatchEvent(new Event('input')); return true;
+    }
+  }
+  first.click(); el.dispatchEvent(new Event('input')); return true;
+}
+elHtml.addEventListener('input', ()=>{
+  const pos = elHtml.selectionStart;
+  if(elHtml.value[pos-1] === '>') attemptAutoClose();
+  updateAttrSuggestions();
+});
+elHtml.addEventListener('keyup', updateAttrSuggestions);
+elHtml.addEventListener('click', updateAttrSuggestions);
+
+const TAGS=['div','span','p','h1','h2','h3','a','img','ul','ol','li','table','tr','td','th','form','input','button','select','option','textarea','label','header','footer','nav','section','article','aside','marquee','video','audio','iframe','blockquote','pre','code','hr','br','strong','em','details','summary','progress','fieldset','canvas'];
+const CSS_PROPS=['color','background','background-color','font-size','font-family','font-weight','text-align','margin','padding','border','border-radius','width','height','display','flex-direction','justify-content','align-items','gap','position','opacity','animation','transition','box-shadow','line-height','cursor','overflow','grid-template-columns','text-decoration'];
+function updateAttrSuggestions(){
+  if(currentTab==='html') return updateHtmlSuggest();
+  if(currentTab==='css') return updateCssSuggest();
+  $('attrSuggest').classList.remove('show');
+}
+// Build the chip bar and reset keyboard-selection to the first item
+let suggestIndex=0;
+function renderChips(bar, items){
+  suggestIndex=0;
+  bar.innerHTML=items.map(([label,onclick],i)=>`<span class="attr-chip${i===0?' sel':''}" onclick="${onclick}">${label}</span>`).join('');
+  bar.classList.toggle('show', items.length>0);
+}
+function moveSuggest(delta){
+  const bar=$('attrSuggest'), chips=[...bar.querySelectorAll('.attr-chip')];
+  if(!chips.length) return false;
+  chips[suggestIndex]?.classList.remove('sel');
+  suggestIndex=(suggestIndex+delta+chips.length)%chips.length;
+  chips[suggestIndex].classList.add('sel');
+  chips[suggestIndex].scrollIntoView({inline:'nearest',block:'nearest'});
+  return true;
+}
+function insertTag(name){
+  const pos=elHtml.selectionStart, t=elHtml.value, lo=t.lastIndexOf('<',pos-1);
+  elHtml.value=t.slice(0,lo+1)+name+t.slice(pos);
+  elHtml.focus(); elHtml.selectionStart=elHtml.selectionEnd=lo+1+name.length;
+  updateAttrSuggestions();
+}
+function updateCssSuggest(){
+  const bar=$('attrSuggest'), before=elCss.value.slice(0,elCss.selectionStart);
+  const inside=(before.match(/{/g)||[]).length>(before.match(/}/g)||[]).length;
+  const line=before.slice(before.lastIndexOf('\n')+1).trim();
+  if(!inside||line.includes(':')||!/^[a-z-]*$/.test(line)){ bar.classList.remove('show'); return; }
+  const list=CSS_PROPS.filter(x=>x.startsWith(line)).slice(0,14);
+  renderChips(bar, list.map(x=>[x,`insertCssProp('${x}')`]));
+}
+function insertCssProp(prop){
+  const pos=elCss.selectionStart, t=elCss.value, ls=t.lastIndexOf('\n',pos-1)+1;
+  const indent=t.slice(ls,pos).match(/^\s*/)[0], ins=indent+prop+': ;';
+  elCss.value=t.slice(0,ls)+ins+t.slice(pos);
+  elCss.focus(); elCss.selectionStart=elCss.selectionEnd=ls+ins.length-1;
+  elCss.dispatchEvent(new Event('input'));
+}
+elCss.addEventListener('input',updateAttrSuggestions);
+elCss.addEventListener('keyup',updateAttrSuggestions);
+elCss.addEventListener('click',updateAttrSuggestions);
+
+function restorePrev(){
+  const pv=safeGet('binayak_prev',null);
+  if(!pv){ alert('Nothing to restore.'); return; }
+  elHtml.value=pv.html; elCss.value=pv.css||''; elJs.value=pv.js||'';
+  updateGutter(); runPreview(); closeModal('projectsModal');
+}
+// {c} = colour from the picker, {u} = value asked from the student (file name / URL)
+const INSERTS={
+'✏ Text':[
+ ['Heading 1','<h1>Heading</h1>'],['Heading 2','<h2>Sub heading</h2>'],['Paragraph','<p>Write your text here.</p>'],
+ ['Link','<a href="https://example.com">Click here</a>'],['Image','@images'],['Bold','<strong>Bold text</strong>'],['Italic','<em>Italic text</em>'],
+ ['Line break','<br>'],['Divider','<hr>'],['Marquee','<marquee>Welcome to Shree Binayak Computer Learning Centre</marquee>'],
+ ['Div box','<div>\n  \n</div>'],['Button','<button>Click me</button>']],
+'☰ Lists/Table':[
+ ['Bullet list','<ul>\n  <li>Item 1</li>\n  <li>Item 2</li>\n  <li>Item 3</li>\n</ul>'],
+ ['Numbered list','<ol>\n  <li>First</li>\n  <li>Second</li>\n  <li>Third</li>\n</ol>'],
+ ['Definition list','<dl>\n  <dt>HTML</dt>\n  <dd>Structure of a web page</dd>\n</dl>'],
+ ['Table 3x3','<table border="1">\n  <tr><td>1</td><td>2</td><td>3</td></tr>\n  <tr><td>4</td><td>5</td><td>6</td></tr>\n  <tr><td>7</td><td>8</td><td>9</td></tr>\n</table>'],
+ ['Table + header','<table border="1">\n  <tr><th>Name</th><th>Class</th><th>Marks</th></tr>\n  <tr><td>Rahul</td><td>10</td><td>85</td></tr>\n  <tr><td>Sita</td><td>10</td><td>92</td></tr>\n</table>']],
+'📝 Forms':[
+ ['Full form','<form>\n  <label>Name:</label><br>\n  <input type="text" placeholder="Your name"><br><br>\n  <label>Email:</label><br>\n  <input type="email" placeholder="Email"><br><br>\n  <label>Course:</label><br>\n  <select>\n    <option>HTML</option>\n    <option>CSS</option>\n  </select><br><br>\n  <button type="submit">Register</button>\n</form>'],
+ ['Text box','<input type="text" placeholder="Your name">'],['Password','<input type="password" placeholder="Password">'],
+ ['Email','<input type="email" placeholder="Email">'],['Number','<input type="number" min="0" max="100">'],['Date','<input type="date">'],
+ ['Checkbox','<label><input type="checkbox"> I agree</label>'],
+ ['Radio buttons','<label><input type="radio" name="g" value="m"> Male</label>\n<label><input type="radio" name="g" value="f"> Female</label>'],
+ ['Dropdown (option)','<select>\n  <option>HTML</option>\n  <option>CSS</option>\n  <option>JavaScript</option>\n</select>'],
+ ['File upload','<input type="file">'],['Text area','<textarea rows="4" cols="30" placeholder="Message"></textarea>'],
+ ['Slider','<input type="range" min="0" max="100">'],['Colour box','<input type="color" value="{c}">'],
+ ['Submit','<button type="submit">Submit</button>'],['Reset','<button type="reset">Reset</button>']],
+'🎬 Media':[
+ ['Audio','<audio controls src="{u}"></audio>','Audio file name or web link:','song.mp3'],
+ ['Video','<video controls width="320" src="{u}"></video>','Video file name or web link:','video.mp4'],
+ ['Iframe','<iframe src="{u}" width="320" height="200"></iframe>','Page link:','https://example.com'],
+ ['Image','@images']],
+'🔷 Shapes':[
+ ['Square','<div style="width:100px;height:100px;background:{c}"></div>'],
+ ['Rectangle','<div style="width:160px;height:90px;background:{c}"></div>'],
+ ['Circle','<div style="width:100px;height:100px;background:{c};border-radius:50%"></div>'],
+ ['Oval','<div style="width:160px;height:90px;background:{c};border-radius:50%"></div>'],
+ ['Rounded box','<div style="width:140px;height:90px;background:{c};border-radius:18px"></div>'],
+ ['Triangle','<div style="width:0;height:0;border-left:50px solid transparent;border-right:50px solid transparent;border-bottom:90px solid {c}"></div>'],
+ ['Diamond','<div style="width:70px;height:70px;background:{c};transform:rotate(45deg);margin:25px"></div>'],
+ ['Star','<div style="width:100px;height:100px;background:{c};clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)"></div>'],
+ ['Hexagon','<div style="width:110px;height:100px;background:{c};clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%)"></div>'],
+ ['Pentagon','<div style="width:100px;height:100px;background:{c};clip-path:polygon(50% 0%,100% 38%,82% 100%,18% 100%,0% 38%)"></div>'],
+ ['Heart','<div style="font-size:80px;color:{c}">&hearts;</div>'],
+ ['Line','<div style="width:200px;height:4px;background:{c}"></div>']]
+};
+let insCat='🔷 Shapes';
+function renderInsert(){
+  $('insCats').innerHTML=Object.keys(INSERTS).map(k=>`<button class="ins-cat${k===insCat?' on':''}" onclick="insCat='${k}';renderInsert()">${k}</button>`).join('');
+  $('insItems').innerHTML=INSERTS[insCat].map((it,i)=>`<button class="ins-item" onclick="insertSnippet(${i})">${it[0]}</button>`).join('');
+}
+// Insert a ready-made snippet at the cursor in the HTML editor
+function insertSnippet(i){
+  const it=INSERTS[insCat][i]; let h=it[1];
+  if(h==='@images'){ openModal('imagesModal'); renderImages(); return; }
+  if(it[2]){ const u=prompt(it[2],it[3]||''); if(u===null) return; h=h.split('{u}').join(u); }
+  h=h.split('{c}').join($('colorPick').value);
+  switchTab('html');
+  const pos=elHtml.selectionStart, en=elHtml.selectionEnd, t=elHtml.value, nl=(pos>0&&t[pos-1]!=='\n')?'\n':'';
+  elHtml.value=t.slice(0,pos)+nl+h+'\n'+t.slice(en);
+  elHtml.selectionStart=elHtml.selectionEnd=pos+nl.length+h.length+1;
+  updateGutter(); elHtml.dispatchEvent(new Event('input'));
+}
+// ---- Colour picker: pick visually or type a hex code; swatches for one-tap picks; quick-apply to selected text ----
+const PRESET_COLORS=['#000000','#ffffff','#ef4444','#f97316','#eab308','#22c55e','#2563eb','#7c3aed','#ec4899','#64748b'];
+$('swatches').innerHTML=PRESET_COLORS.map(c=>`<span class="swatch" style="background:${c}" onclick="setColor('${c}')" title="${c}"></span>`).join('');
+function setColor(v){ $('colorPick').value=v; $('colorHexInput').value=v; }
+$('colorPick').addEventListener('input',()=>setColor($('colorPick').value));
+$('colorHexInput').addEventListener('change',()=>{
+  let v=$('colorHexInput').value.trim(); if(v[0]!=='#') v='#'+v;
+  if(/^#[0-9a-fA-F]{6}$/.test(v)) setColor(v); else $('colorHexInput').value=$('colorPick').value;
+});
+// Insert the picked colour code as plain text at the cursor
+function insertColor(){
+  const el=EDS[currentTab]||elHtml, v=$('colorPick').value, s=el.selectionStart, e=el.selectionEnd;
+  el.value=el.value.slice(0,s)+v+el.value.slice(e);
+  el.selectionStart=el.selectionEnd=s+v.length; el.dispatchEvent(new Event('input'));
+}
+// Wrap the text selected in the HTML editor with a span/div using the picked colour
+function applyColor(kind){
+  switchTab('html');
+  const v=$('colorPick').value, s=elHtml.selectionStart, e=elHtml.selectionEnd;
+  const sel=elHtml.value.slice(s,e)||'text';
+  const style=kind==='text'?`color:${v}`:kind==='bg'?`background:${v};padding:10px`:`border:2px solid ${v};padding:10px`;
+  const wrapped=`<span style="${style}">${sel}</span>`;
+  elHtml.value=elHtml.value.slice(0,s)+wrapped+elHtml.value.slice(e);
+  elHtml.selectionStart=s; elHtml.selectionEnd=s+wrapped.length;
+  elHtml.focus(); elHtml.dispatchEvent(new Event('input'));
+}
+
+function runPreview(){
+  const doc = `<!DOCTYPE html><html><head><style>${elCss.value}</style></head><body>${elHtml.value}<script>${elJs.value}<\/script></body></html>`;
+  document.getElementById('preview').srcdoc = resolveImages(doc);
+  safeSet('binayak_last_html', elHtml.value);
+  safeSet('binayak_last_css', elCss.value);
+  safeSet('binayak_last_js', elJs.value);
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e=>{
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s'){ e.preventDefault(); saveProject(); }
+  if((e.ctrlKey||e.metaKey) && e.key==='Enter'){ e.preventDefault(); runPreview(); }
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='n'){ e.preventDefault(); newProject(); }
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='k'){ e.preventDefault(); openCP(); }
+  if((e.ctrlKey||e.metaKey) && e.shiftKey && e.key.toLowerCase()==='p'){ e.preventDefault(); openCP(); }
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='f' && !e.altKey){ e.preventDefault(); cmdFindReplace(); }
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='h'){ e.preventDefault(); cmdFindReplace(); }
+  if(e.shiftKey && e.altKey && e.key.toLowerCase()==='f'){ e.preventDefault(); formatCode(); }
+  if(e.key==='F11'){ e.preventDefault(); toggleFullscreen(); }
+  if(e.key==='Escape'){ closeMenus(); }
+});
+
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme');
+  document.documentElement.setAttribute('data-theme', cur==='light' ? 'dark' : 'light');
+}
+function toggleFullscreen(){
+  if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+  else document.exitFullscreen();
+}
+function showMobile(which){
+  document.getElementById('codePanel').classList.toggle('hide', which!=='code');
+  document.getElementById('previewPanel').classList.toggle('hide', which!=='preview');
+}
+function openModal(id){ document.getElementById(id).classList.add('show'); document.body.classList.add('modal-open'); if(typeof closeMenus==='function') closeMenus(); }
+function closeModal(id){
+  document.getElementById(id).classList.remove('show');
+  if(!document.querySelector('.modal-bg.show')) document.body.classList.remove('modal-open');
+}
+
+// Resizer
+(function(){
+  const resizer = document.getElementById('resizer');
+  const left = document.getElementById('codePanel');
+  let dragging=false;
+  resizer.addEventListener('mousedown', ()=>dragging=true);
+  document.addEventListener('mouseup', ()=>dragging=false);
+  document.addEventListener('mousemove', e=>{
+    if(!dragging) return;
+    const main = document.querySelector('main');
+    const pct = Math.min(80, Math.max(20, (e.clientX/main.clientWidth)*100));
+    left.style.width = pct+'%';
+    document.getElementById('previewPanel').style.width = (100-pct)+'%';
+  });
+})();
+
+// Projects
+function newProject(){
+  if(!confirm('Start a new blank project? Unsaved changes will be lost.')) return;
+  currentProjectId = null;
+  elHtml.value=''; elCss.value=''; elJs.value='';
+  updateGutter(); runPreview();
+  markSaved('New project');
+}
+function saveProject(){
+  let name = currentProjectId ? getProjects().find(p=>p.id===currentProjectId)?.name : prompt('Project name:', 'My Project');
+  if(!name) return;
+  const projects = getProjects();
+  const now = new Date().toLocaleString();
+  if(currentProjectId){
+    const p = projects.find(x=>x.id===currentProjectId);
+    p.html=elHtml.value; p.css=elCss.value; p.js=elJs.value; p.updated=now;
+  } else {
+    currentProjectId = 'p'+Date.now();
+    projects.push({id:currentProjectId, name, html:elHtml.value, css:elCss.value, js:elJs.value, student:session.name, created:now, updated:now});
+  }
+  safeSet('binayak_projects', projects);
+  markSaved('Saved · '+now);
+}
+function getProjects(){ return safeGet('binayak_projects', []); }
+function renderProjects(){
+  const list = document.getElementById('projectsList');
+  const projects = getProjects();
+  if(!projects.length){ list.innerHTML = '<p style="color:var(--muted)">No saved projects yet.</p>'; return; }
+  list.innerHTML = projects.map(p=>`
+    <div class="proj-card">
+      <div class="row">
+        <div><strong>${escapeHtml(p.name)}</strong><br><span class="chip">${p.updated}</span></div>
+        <div class="actions">
+          <button class="btn" onclick="openProject('${p.id}')">Open</button>
+          <button class="btn" onclick="renameProject('${p.id}')">Rename</button>
+          <button class="btn" onclick="duplicateProject('${p.id}')">Duplicate</button>
+          <button class="btn danger" onclick="deleteProject('${p.id}')">Delete</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function openProject(id){
+  const p = getProjects().find(x=>x.id===id);
+  if(!p) return;
+  currentProjectId = id;
+  elHtml.value=p.html; elCss.value=p.css; elJs.value=p.js||'';
+  updateGutter(); runPreview();
+  closeModal('projectsModal');
+  markSaved('Opened '+p.name);
+}
+function renameProject(id){
+  const projects = getProjects();
+  const p = projects.find(x=>x.id===id);
+  const name = prompt('New name:', p.name);
+  if(!name) return;
+  p.name = name;
+  safeSet('binayak_projects', projects);
+  renderProjects();
+}
+function duplicateProject(id){
+  const projects = getProjects();
+  const p = projects.find(x=>x.id===id);
+  const copy = {...p, id:'p'+Date.now(), name:p.name+' (copy)', updated:new Date().toLocaleString()};
+  projects.push(copy);
+  safeSet('binayak_projects', projects);
+  renderProjects();
+}
+function deleteProject(id){
+  if(!confirm('Delete this project?')) return;
+  safeSet('binayak_projects', getProjects().filter(x=>x.id!==id));
+  renderProjects();
+}
+function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// Downloads
+function downloadHTML(){
+  const doc = `<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<style>\n${elCss.value}\n</style>\n</head>\n<body>\n${elHtml.value}\n<script>\n${elJs.value}\n<\/script>\n</body>\n</html>`;
+  triggerDownload('index.html', resolveImages(doc));
+}
+function downloadPair(){
+  triggerDownload('index.html', `<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<link rel="stylesheet" href="style.css">\n</head>\n<body>\n${resolveImages(elHtml.value)}\n<script src="script.js"><\/script>\n</body>\n</html>`);
+  setTimeout(()=>triggerDownload('style.css', resolveImages(elCss.value)), 300);
+  setTimeout(()=>triggerDownload('script.js', elJs.value), 600);
+}
+// ---- Image library: pictures are stored in the browser and used by name (src="photo.jpg") ----
+function getImages(){ return safeGet('binayak_images',[]); }
+function resolveImages(str){
+  getImages().forEach(im=>{
+    [['"','"'],["'","'"],['(',')']].forEach(([a,b])=>{ str=str.split(a+im.name+b).join(a+im.data+b); });
+  });
+  return str;
+}
+function addImages(input){
+  [...input.files].forEach(f=>{
+    const rd=new FileReader();
+    rd.onload=()=>{ const img=new Image(); img.onload=()=>{
+      const W=img.width||300, H=img.height||300, s=Math.min(1,800/Math.max(W,H)), cv=document.createElement('canvas');
+      cv.width=Math.round(W*s); cv.height=Math.round(H*s);
+      cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+      const data=cv.toDataURL(/png|gif|svg/i.test(f.type)?'image/png':'image/jpeg',0.8);
+      const name=f.name.toLowerCase().replace(/[^a-z0-9._-]/g,'-');
+      const list=getImages().filter(x=>x.name!==name); list.push({name,data});
+      if(!safeSet('binayak_images',list)) alert('Storage is full. Delete some images first.');
+      renderImages(); runPreview();
+    }; img.src=rd.result; };
+    rd.readAsDataURL(f);
+  });
+  input.value='';
+}
+function renderImages(){
+  const l=getImages();
+  $('imagesList').innerHTML=l.length?l.map((im,i)=>`<div class="proj-card"><div class="row"><div style="display:flex;gap:.6rem;align-items:center"><img src="${im.data}" style="width:48px;height:48px;object-fit:cover;border-radius:6px"><strong style="font-size:.8rem;word-break:break-all">${escapeHtml(im.name)}</strong></div><div class="actions"><button class="btn primary" onclick="insertImage(${i})">Insert</button><button class="btn danger" onclick="deleteImage(${i})">Delete</button></div></div></div>`).join(''):'<p style="color:var(--muted)">No images yet. Upload one below.</p>';
+}
+function insertImage(i){
+  const im=getImages()[i]; switchTab('html');
+  const pos=elHtml.selectionStart, t=elHtml.value, tag=`<img src="${im.name}" alt="" width="200">`;
+  elHtml.value=t.slice(0,pos)+tag+t.slice(pos);
+  elHtml.focus(); elHtml.selectionStart=elHtml.selectionEnd=pos+tag.length;
+  updateGutter(); runPreview(); closeModal('imagesModal');
+}
+function deleteImage(i){ const l=getImages(); l.splice(i,1); safeSet('binayak_images',l); renderImages(); runPreview(); }
+
+// Open the student's page as a real full-size page in a new browser tab
+function openInBrowser(){
+  const doc = `<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>Preview</title>\n<style>\n${elCss.value}\n</style>\n</head>\n<body>\n${elHtml.value}\n<script>\n${elJs.value}\n<\/script>\n</body>\n</html>`;
+  const url = URL.createObjectURL(new Blob([resolveImages(doc)], {type:'text/html'}));
+  const w = window.open(url, '_blank');
+  if(!w){ alert('Your browser blocked the new tab. Allow pop-ups for this page, or use the HTML download button and open that file.'); }
+  setTimeout(()=>URL.revokeObjectURL(url), 60000);
+}
+function triggerDownload(filename, content){
+  const blob = new Blob([content], {type:'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Practice Zone
+const EXERCISES = [
+  {name:'Hello World', html:'<h1>Hello, World!</h1>', css:'h1{color:#2563eb;text-align:center;margin-top:60px}'},
+  {name:'My Introduction', html:'<h2>Hi, I am a student at Shree Binayak.</h2><p>I am learning HTML and CSS.</p>', css:'body{font-family:Arial;padding:30px}'},
+  {name:'My School', html:'<h1>My Institute</h1><p>Shree Binayak Computer Learning Centre, Borigumma.</p>', css:'h1{color:green}'},
+  {name:'Favourite Hobby', html:'<h2>My Favourite Hobby</h2><p>I like coding websites.</p>', css:'body{background:#f5f5f5}'},
+  {name:'Student Profile', html:'<h2>Student Profile</h2><p>Name: ______</p><p>Class: ______</p>', css:'p{font-size:18px}'},
+  {name:'Simple Table', html:'<table border="1"><tr><th>Name</th><th>Marks</th></tr><tr><td>Rahul</td><td>85</td></tr></table>', css:'table{border-collapse:collapse;margin:20px auto}td,th{padding:8px}'},
+  {name:'Registration Form', html:'<form><input placeholder="Name"><br><br><input placeholder="Email"><br><br><button>Register</button></form>', css:'form{max-width:300px;margin:30px auto}input{width:100%;padding:8px;margin-bottom:5px}'},
+  {name:'Image Gallery', html:'<div class="gallery"><img src="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27100%27 height=%27100%27%3E%3Crect width=%27100%27 height=%27100%27 fill=%27%232563eb%27/%3E%3C/svg%3E"><img src="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27100%27 height=%27100%27%3E%3Crect width=%27100%27 height=%27100%27 fill=%27%232563eb%27/%3E%3C/svg%3E"></div>', css:'.gallery{display:flex;gap:10px;justify-content:center;padding:20px}'},
+  {name:'Simple Portfolio', html:'<h1>My Portfolio</h1><p>Web Developer in Training</p>', css:'body{text-align:center;background:#111;color:#fff;padding:40px}'},
+  {name:'Institute Website', html:'<header><h1>Shree Binayak Computer Learning Centre</h1></header><p>Empowering students with technology skills.</p>', css:'header{background:#2563eb;color:#fff;padding:20px;text-align:center}'}
+];
+const JS_EXERCISES=[
+  {name:'JS: Click a Button',html:'<button id="b">Click me</button>\n<p id="msg"></p>',css:'button{padding:10px 20px}',js:"document.getElementById('b').onclick = function(){\n  document.getElementById('msg').textContent = 'Hello from JavaScript!';\n};"},
+  {name:'JS: Counter',html:'<h2 id="n">0</h2>\n<button id="add">+1</button>',css:'body{text-align:center}',js:"let count = 0;\ndocument.getElementById('add').onclick = function(){\n  count++;\n  document.getElementById('n').textContent = count;\n};"},
+  {name:'JS: Change Colour',html:'<h1 id="t">Change my colour</h1>\n<button id="c">Go</button>',css:'',js:"document.getElementById('c').onclick = function(){\n  document.getElementById('t').style.color = 'red';\n};"}
+];
+// One practical per tag/topic, built from the Robo knowledge base so both stay in sync
+function tagPracticals(){
+  return ROBO_KB.map(k=>{
+    const grab=l=>{const m=k.reply.match(new RegExp('```'+l+'\\n([\\s\\S]*?)```'));return m?m[1].trim():'';};
+    return {name:'Practical: '+k.kw[0], task:'Task: recreate this example, change the text, add a second one, then style it with CSS.', html:grab('html')||'<div>Sample content</div>', css:grab('css')};
+  });
+}
+let PRACTICE_DEFAULT=null;
+function practiceDefaults(){
+  if(!PRACTICE_DEFAULT) PRACTICE_DEFAULT=[...EXERCISES.map(e=>({...e,task:'Beginner exercise: complete and improve it.'})),...JS_EXERCISES.map(e=>({...e,task:'JavaScript practical: run it, then change it.'})),...tagPracticals()];
+  return PRACTICE_DEFAULT;
+}
+// Admin edits are saved as a full copy of the list; "Reset" brings back the built-in list
+function getPractice(){ return safeGet('binayak_practice',null)||practiceDefaults().map(x=>({...x})); }
+function savePractice(l){ safeSet('binayak_practice',l); buildPractice(); }
+function buildPractice(){
+  const q=($('practiceSearch')?.value||'').toLowerCase(), admin=session.role==='admin';
+  $('practiceAdmin').innerHTML=admin?`<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.6rem"><button class="btn good" onclick="addPractical()">＋ Save editor code as new practical</button><button class="btn" onclick="resetPractice()">Reset to defaults</button></div>`:'';
+  $('practiceList').innerHTML=getPractice().map((ex,i)=>({ex,i})).filter(o=>o.ex.name.toLowerCase().includes(q)).map(o=>`<div class="proj-card"><div class="row"><div><strong>${escapeHtml(o.ex.name)}</strong><br><span style="font-size:.72rem;color:var(--muted)">${escapeHtml(o.ex.task||'')}</span></div><div class="actions"><button class="btn primary" onclick="loadExercise(${o.i})">Open</button>${admin?`<button class="btn" onclick="editPractical(${o.i})">Edit</button><button class="btn danger" onclick="deletePractical(${o.i})">Delete</button>`:''}</div></div></div>`).join('')||'<p style="color:var(--muted)">No match.</p>';
+}
+function loadExercise(i){
+  const ex=getPractice()[i];
+  elHtml.value=ex.html||''; elCss.value=ex.css||''; elJs.value=ex.js||'';
+  updateGutter(); runPreview(); closeModal('practiceModal');
+}
+function addPractical(){
+  const name=prompt('Practical title:'); if(!name) return;
+  const task=prompt('Task / instructions for students:','Task: ')||'';
+  const l=getPractice(); l.push({name,task,html:elHtml.value,css:elCss.value,js:elJs.value}); savePractice(l);
+}
+function editPractical(i){
+  const l=getPractice(), x=l[i], name=prompt('Title:',x.name); if(!name) return;
+  x.name=name; const t=prompt('Task:',x.task||''); if(t!==null) x.task=t;
+  if(confirm('Replace the starter code of this practical with the code in the editor now?\nOK = replace, Cancel = keep old code')){ x.html=elHtml.value; x.css=elCss.value; x.js=elJs.value; }
+  savePractice(l);
+}
+function deletePractical(i){ if(!confirm('Delete this practical?')) return; const l=getPractice(); l.splice(i,1); savePractice(l); }
+function resetPractice(){
+  if(!confirm('Reset the Practice Zone to the built-in list? Your custom practicals will be removed.')) return;
+  try{ localStorage.removeItem('binayak_practice'); }catch(e){}
+  buildPractice();
+}
+
+// ---- Login (demo only; keep separate so real auth can replace it later) ----
+function pinHash(s){
+  s='sbcl:'+s; let h1=0xdeadbeef,h2=0x41c6ce57;
+  for(let i=0;i<s.length;i++){const ch=s.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677);}
+  h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);
+  h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);
+  return (4294967296*(2097151&h2)+(h1>>>0)).toString(36);
+}
+const DEFAULT_PIN_HASH='xi785n3x5q'; // only a hash is stored, never the PIN itself
+function changePin(){
+  const n=prompt('Enter a new teacher PIN (at least 4 characters):');
+  if(!n) return; if(n.length<4){ alert('PIN too short.'); return; }
+  safeSet('binayak_pin',pinHash(n)); alert('PIN changed on this computer.');
+}
+let session=safeGet('binayak_session',{role:'student',name:'Guest Student'});
+function doLogin(){
+  const role=$('loginRole').value, name=$('loginName').value.trim()||(role==='admin'?'Teacher':'Guest Student');
+  if(role==='admin' && pinHash($('loginPin').value)!==safeGet('binayak_pin',DEFAULT_PIN_HASH)){ alert('Wrong PIN'); return; }
+  session={role,name};
+  if(role==='student') safeSet('binayak_session',session);
+  $('loginPin').value=''; applySession(); closeModal('loginModal');
+}
+function applySession(){
+  $('studentLabel').textContent=session.name+(session.role==='admin'?' (Teacher)':'');
+  $('adminBtn').style.display=session.role==='admin'?'flex':'none';
+  buildPractice();
+}
+
+// ---- Assignments: stored in localStorage, created by admin, auto-checked by rules ----
+const DEFAULT_ASSIGN=[{id:'a1',title:'Create Your First Webpage',instructions:['Create an H1 heading.','Add a paragraph.','Change heading colour to blue.','Add a background colour.','Create a button.'],rules:[{type:'html',value:'h1',label:'H1 heading found'},{type:'html',value:'p',label:'Paragraph found'},{type:'css',value:'color:blue',label:'Blue colour detected'},{type:'css',value:'background',label:'Background colour added'},{type:'html',value:'button',label:'Button found'}]}];
+function getAssignments(){
+  let a=safeGet('binayak_assignments',null);
+  if(!a||!a.length){ a=DEFAULT_ASSIGN; safeSet('binayak_assignments',a); }
+  return a;
+}
+// Rule types: html = CSS selector exists | css = property[:value] | js = code contains | text = page text contains
+function runRule(r){
+  const v=(r.value||'').trim(), doc=new DOMParser().parseFromString(elHtml.value,'text/html');
+  if(r.type==='html'){ try{ return !!doc.querySelector(v); }catch(e){ return false; } }
+  if(r.type==='css'){
+    const [prop,val]=v.split(':').map(s=>s.trim().toLowerCase());
+    const re=/([a-z-]+)\s*:\s*([^;}]+)/gi; let m;
+    while((m=re.exec(elCss.value))){
+      const p=m[1].toLowerCase(), x=m[2].toLowerCase();
+      if(p===prop||p.startsWith(prop+'-')){
+        if(!val) return true;
+        if(val==='blue' ? /blue|#2563eb|#00[0-9a-f]f|rgb\(\s*0\s*,\s*0\s*,\s*255/.test(x) : x.includes(val)) return true;
+      }
+    }
+    return false;
+  }
+  if(r.type==='js') return elJs.value.toLowerCase().includes(v.toLowerCase());
+  if(r.type==='text') return doc.body.textContent.toLowerCase().includes(v.toLowerCase());
+  return false;
+}
+function currentAssignment(){ return getAssignments().find(a=>a.id===$('assignSelect').value); }
+function buildAssignment(){
+  const list=getAssignments(), keep=$('assignSelect').value;
+  $('assignSelect').innerHTML=list.map(a=>`<option value="${a.id}">${escapeHtml(a.title)}</option>`).join('');
+  if(list.some(a=>a.id===keep)) $('assignSelect').value=keep;
+  showAssignment();
+}
+function showAssignment(){
+  const a=currentAssignment(); if(!a) return;
+  $('assignTitle').textContent=a.title;
+  $('assignInstructions').innerHTML=a.instructions.map(i=>`<li>${escapeHtml(i)}</li>`).join('');
+  $('assignResults').innerHTML='';
+}
+function checkAssignment(){
+  const a=currentAssignment(); if(!a) return {passed:0,total:0};
+  const res=a.rules.map(r=>[r.label||r.value,runRule(r)]), passed=res.filter(r=>r[1]).length;
+  $('assignResults').innerHTML=res.map(r=>`<div class="${r[1]?'check-ok':'check-bad'}">${r[1]?'✅':'❌'} ${escapeHtml(r[0])}</div>`).join('')+`<p><strong>Assignment Progress: ${passed}/${res.length} completed</strong></p>`;
+  return {passed,total:res.length};
+}
+function submitAssignment(){
+  const a=currentAssignment(); if(!a) return;
+  const r=checkAssignment();
+  if(!confirm(`Submit "${a.title}" as ${session.name}?\nScore: ${r.passed}/${r.total}`)) return;
+  const subs=safeGet('binayak_submissions',[]);
+  subs.push({student:session.name,assignmentId:a.id,title:a.title,html:elHtml.value,css:elCss.value,js:elJs.value,date:new Date().toLocaleString(),score:r.passed,total:r.total,marks:null,remarks:'',status:r.passed===r.total?'Completed':'Submitted (incomplete)'});
+  safeSet('binayak_submissions',subs);
+  alert('Assignment submitted successfully.');
+}
+
+// ---- Admin panel ----
+let editingId=null;
+function openAdmin(){ if(session.role!=='admin') return; renderAdmin(); openModal('adminModal'); }
+function renderAdmin(){
+  $('adminAssignments').innerHTML='<h3 style="font-size:.9rem">Assignments</h3>'+getAssignments().map(a=>`<div class="assign-item"><b>${escapeHtml(a.title)}</b> <span class="chip">${a.rules.length} checks</span><div style="margin-top:.3rem;display:flex;gap:.3rem"><button class="btn" onclick="editAssign('${a.id}')">Edit</button><button class="btn danger" onclick="delAssign('${a.id}')">Delete</button></div></div>`).join('');
+  const subs=safeGet('binayak_submissions',[]);
+  $('adminSubs').innerHTML=subs.length?subs.map((s,i)=>`<div class="proj-card"><b>${escapeHtml(s.student)}</b> · ${escapeHtml(s.title||s.assignment||'')}<br><span class="chip">${s.date}</span> <span class="chip">Auto: ${s.score??'-'}/${s.total??'-'}</span><div style="margin-top:.4rem;display:flex;gap:.3rem;flex-wrap:wrap"><button class="btn" onclick="viewSub(${i})">View code</button><input type="text" id="mk${i}" placeholder="Marks" value="${s.marks??''}" style="width:70px"><input type="text" id="rm${i}" placeholder="Remarks" value="${escapeHtml(s.remarks||'')}" style="flex:1;min-width:100px"><button class="btn good" onclick="gradeSub(${i})">Save</button></div></div>`).join(''):'<p style="color:var(--muted)">No submissions yet.</p>';
+}
+function saveAssignment(){
+  const title=$('aTitle').value.trim(); if(!title){ alert('Enter a title'); return; }
+  const instructions=$('aInstr').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  const rules=$('aRules').value.split('\n').map(l=>l.split('|').map(s=>s.trim())).filter(p=>p.length>=2&&p[1]).map(p=>({type:p[0].toLowerCase(),value:p[1],label:p[2]||p[1]}));
+  const list=getAssignments();
+  if(editingId){ Object.assign(list.find(x=>x.id===editingId),{title,instructions,rules}); }
+  else list.push({id:'a'+Date.now(),title,instructions,rules});
+  editingId=null; safeSet('binayak_assignments',list);
+  $('aTitle').value=''; $('aInstr').value=''; $('aRules').value='';
+  renderAdmin(); buildAssignment();
+}
+function editAssign(id){
+  const a=getAssignments().find(x=>x.id===id); editingId=id;
+  $('aTitle').value=a.title; $('aInstr').value=a.instructions.join('\n');
+  $('aRules').value=a.rules.map(r=>[r.type,r.value,r.label].join('|')).join('\n');
+}
+function delAssign(id){
+  if(!confirm('Delete this assignment?')) return;
+  safeSet('binayak_assignments',getAssignments().filter(x=>x.id!==id));
+  renderAdmin(); buildAssignment();
+}
+function viewSub(i){
+  const s=safeGet('binayak_submissions',[])[i];
+  elHtml.value=s.html; elCss.value=s.css; elJs.value=s.js||'';
+  updateGutter(); runPreview(); closeModal('adminModal');
+}
+function gradeSub(i){
+  const subs=safeGet('binayak_submissions',[]);
+  subs[i].marks=$('mk'+i).value; subs[i].remarks=$('rm'+i).value;
+  safeSet('binayak_submissions',subs); alert('Saved.');
+}
+function exportAssign(){ triggerDownload('assignments.json',JSON.stringify(getAssignments(),null,2)); }
+function importAssign(input){
+  const f=input.files[0]; if(!f) return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    try{
+      const inc=JSON.parse(rd.result); if(!Array.isArray(inc)) throw 0;
+      const list=getAssignments();
+      inc.forEach(a=>{ const k=list.findIndex(x=>x.id===a.id); if(k>=0) list[k]=a; else list.push(a); });
+      safeSet('binayak_assignments',list); buildAssignment(); alert('Imported '+inc.length+' assignment(s).');
+    }catch(e){ alert('Invalid assignments file.'); }
+  };
+  rd.readAsText(f); input.value='';
+}
+function exportResults(){
+  const q=x=>'"'+String(x??'').replace(/"/g,'""')+'"';
+  const rows=[['Student','Assignment','Date','Auto score','Total','Marks','Remarks','Status']].concat(safeGet('binayak_submissions',[]).map(s=>[s.student,s.title||s.assignment,s.date,s.score,s.total,s.marks,s.remarks,s.status]));
+  triggerDownload('results.csv',rows.map(r=>r.map(q).join(',')).join('\n'));
+}
+
+// Robo Helper — works fully offline (rule-based knowledge base + code diagnostics).
+// If opened inside the claude.ai artifact viewer it will also try live AI answers as a bonus.
+let roboSample = null;
+async function getRobo(){
+  if(roboSample !== null) return roboSample;
+  try{
+    if(typeof claude === 'undefined' || !claude.use){ roboSample = false; return roboSample; }
+    const s = await claude.use('sample');
+    roboSample = s || false;
+  }catch(e){ roboSample = false; }
+  return roboSample;
+}
+
+// ---- Offline knowledge base: topic -> {keywords, reply} ----
+const ROBO_KB = [
+  {kw:['table'], reply:"Here's a simple table:\n```html\n<table border=\"1\">\n  <tr><th>Name</th><th>Marks</th></tr>\n  <tr><td>Rahul</td><td>85</td></tr>\n</table>\n```\nUse `<tr>` for rows, `<th>` for headers, and `<td>` for cells."},
+  {kw:['form','input','registration'], reply:"Here's a basic form:\n```html\n<form>\n  <input type=\"text\" placeholder=\"Name\"><br><br>\n  <input type=\"email\" placeholder=\"Email\"><br><br>\n  <button type=\"submit\">Register</button>\n</form>\n```\nEach field needs a `type`, and a `<button>` submits it."},
+  {kw:['list','bullet','ul','ol'], reply:"Two kinds of lists:\n```html\n<ul>\n  <li>HTML</li>\n  <li>CSS</li>\n</ul>\n<ol>\n  <li>Step one</li>\n  <li>Step two</li>\n</ol>\n```\n`<ul>` is bullets, `<ol>` is numbered."},
+  {kw:['image','img','picture'], reply:"To add an image:\n```html\n<img src=\"photo.jpg\" alt=\"My photo\" width=\"200\">\n```\n`src` is the file, `alt` is text shown if it can't load."},
+  {kw:['link','anchor','hyperlink'], reply:"To add a link:\n```html\n<a href=\"https://example.com\">Visit Site</a>\n```\n`href` is the destination URL."},
+  {kw:['button'], reply:"A styled button:\n```html\n<button>Click Me</button>\n```\n```css\nbutton {\n  padding: 10px 20px;\n  background: #2563eb;\n  color: white;\n  border: none;\n  border-radius: 6px;\n}\n```"},
+  {kw:['center','centre','centering'], reply:"To center a block element:\n```css\ndiv {\n  width: 200px;\n  margin: 0 auto;\n  text-align: center;\n}\n```\n`margin: 0 auto` centers it horizontally; `text-align: center` centers the text inside."},
+  {kw:['flex','flexbox'], reply:"Flexbox example:\n```css\n.container {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  gap: 10px;\n}\n```\n`justify-content` controls horizontal spacing, `align-items` controls vertical alignment."},
+  {kw:['grid'], reply:"CSS Grid example:\n```css\n.container {\n  display: grid;\n  grid-template-columns: 1fr 1fr 1fr;\n  gap: 10px;\n}\n```\nThis makes 3 equal columns."},
+  {kw:['color','colour'], reply:"Setting text color:\n```css\nh1 { color: blue; }\n```\nYou can use a name (`blue`), a hex code (`#2563eb`), or `rgb(0,0,255)`."},
+  {kw:['background'], reply:"Setting a background:\n```css\nbody { background-color: #f5f5f5; }\n```\nYou can also use `background-image: url('pic.jpg');`."},
+  {kw:['border'], reply:"Adding a border:\n```css\ndiv {\n  border: 2px solid #2563eb;\n  border-radius: 8px;\n}\n```"},
+  {kw:['margin','padding'], reply:"`margin` is space OUTSIDE an element's border; `padding` is space INSIDE it, between the border and the content.\n```css\ndiv {\n  margin: 10px;\n  padding: 15px;\n}\n```"},
+  {kw:['font','typography'], reply:"Setting fonts:\n```css\nbody {\n  font-family: Arial, sans-serif;\n  font-size: 16px;\n}\n```"},
+  {kw:['animation','animate'], reply:"A simple animation:\n```css\n@keyframes fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\nh1 { animation: fade 2s; }\n```"},
+  {kw:['navbar','navigation','menu'], reply:"A simple navbar:\n```html\n<nav>\n  <a href=\"#\">Home</a>\n  <a href=\"#\">About</a>\n  <a href=\"#\">Contact</a>\n</nav>\n```\n```css\nnav a { margin-right: 15px; text-decoration: none; }\n```"},
+  {kw:['div','span'], reply:"`<div>` is a block-level container (starts on a new line, takes full width). `<span>` is inline (fits within text). Use `<div>` for layout sections and `<span>` to style a small bit of text."},
+  {kw:['id','class'], reply:"`class` can be reused on many elements and is styled with `.name { }`. `id` must be unique on the page and is styled with `#name { }`. Prefer `class` for styling, `id` for JavaScript hooks."},
+  {kw:['marquee','scroll text','moving text'], reply:"Scrolling text with `<marquee>`:\n```html\n<marquee behavior=\"scroll\" direction=\"left\" scrollamount=\"6\">Welcome to Shree Binayak Computer Learning Centre!</marquee>\n```\nNote: `<marquee>` is old and not part of modern HTML standards — for real projects, CSS animation (ask me about \"animation\") is the modern replacement."},
+  {kw:['video'], reply:"Embedding a video:\n```html\n<video src=\"movie.mp4\" controls width=\"320\"></video>\n```\n`controls` shows play/pause buttons."},
+  {kw:['audio'], reply:"Embedding audio:\n```html\n<audio src=\"song.mp3\" controls></audio>\n```"},
+  {kw:['iframe','embed page'], reply:"Embedding another page:\n```html\n<iframe src=\"https://example.com\" width=\"300\" height=\"200\"></iframe>\n```"},
+  {kw:['header'], reply:"A page header:\n```html\n<header>\n  <h1>Shree Binayak Computer Learning Centre</h1>\n</header>\n```"},
+  {kw:['footer'], reply:"A page footer:\n```html\n<footer>\n  <p>&copy; 2026 Shree Binayak Computer Learning Centre</p>\n</footer>\n```"},
+  {kw:['nav','navbar','navigation','menu'], reply:"A navigation menu:\n```html\n<nav>\n  <a href=\"#\">Home</a>\n  <a href=\"#\">About</a>\n  <a href=\"#\">Contact</a>\n</nav>\n```"},
+  {kw:['section'], reply:"Grouping content:\n```html\n<section>\n  <h2>About Us</h2>\n  <p>We teach HTML and CSS.</p>\n</section>\n```"},
+  {kw:['article'], reply:"An article block:\n```html\n<article>\n  <h2>Notice</h2>\n  <p>Classes resume Monday.</p>\n</article>\n```"},
+  {kw:['aside','sidebar'], reply:"A sidebar:\n```html\n<aside>\n  <p>Quick links here.</p>\n</aside>\n```"},
+  {kw:['blockquote','quote'], reply:"A quotation:\n```html\n<blockquote>Learning never exhausts the mind.</blockquote>\n```"},
+  {kw:['pre','code','preformatted'], reply:"Showing code on a page:\n```html\n<pre><code>let x = 5;</code></pre>\n```\n`<pre>` keeps spacing, `<code>` shows monospace font."},
+  {kw:['hr','line','divider'], reply:"A horizontal divider line:\n```html\n<hr>\n```"},
+  {kw:['bold','strong'], reply:"Bold text:\n```html\n<strong>Important!</strong>\n```"},
+  {kw:['italic','emphasis'], reply:"Italic text:\n```html\n<em>Emphasized</em>\n```"},
+  {kw:['details','summary','collapsible'], reply:"A collapsible section:\n```html\n<details>\n  <summary>Click to expand</summary>\n  <p>Hidden content here.</p>\n</details>\n```"},
+  {kw:['progress'], reply:"A progress bar:\n```html\n<progress value=\"70\" max=\"100\"></progress>\n```"},
+  {kw:['select','dropdown'], reply:"A dropdown:\n```html\n<select>\n  <option>HTML</option>\n  <option>CSS</option>\n</select>\n```"},
+  {kw:['textarea'], reply:"A multi-line text box:\n```html\n<textarea rows=\"4\" cols=\"30\" placeholder=\"Type here...\"></textarea>\n```"},
+  {kw:['label'], reply:"Labeling a form field:\n```html\n<label for=\"name\">Name:</label>\n<input id=\"name\" type=\"text\">\n```"},
+  {kw:['fieldset'], reply:"Grouping form fields:\n```html\n<fieldset>\n  <legend>Student Info</legend>\n  <input placeholder=\"Name\">\n</fieldset>\n```"},
+  {kw:['canvas'], reply:"A drawing canvas (needs JavaScript to draw on it):\n```html\n<canvas id=\"myCanvas\" width=\"200\" height=\"100\"></canvas>\n```"}
+];
+
+function matchKnowledgeBase(q){
+  const lower = q.toLowerCase();
+  let best=null, bestScore=0;
+  for(const item of ROBO_KB){
+    let score=0;
+    for(const k of item.kw){ if(lower.includes(k)) score++; }
+    if(score>bestScore){ bestScore=score; best=item; }
+  }
+  return bestScore>0 ? best.reply : null;
+}
+
+function runDiagnostics(){
+  const html = elHtml.value;
+  const css = elCss.value;
+  const issues = [];
+  const openTags = html.match(/<([a-z][a-z0-9]*)(?![^>]*\/>)[^>]*>/gi) || [];
+  const closeTags = html.match(/<\/([a-z][a-z0-9]*)>/gi) || [];
+  const selfClosing = ['img','br','input','hr','meta','link'];
+  const openCounts = {}, closeCounts = {};
+  openTags.forEach(t=>{ const m=t.match(/<([a-z0-9]+)/i); if(m){ const tag=m[1].toLowerCase(); if(!selfClosing.includes(tag)) openCounts[tag]=(openCounts[tag]||0)+1; } });
+  closeTags.forEach(t=>{ const m=t.match(/<\/([a-z0-9]+)/i); if(m){ const tag=m[1].toLowerCase(); closeCounts[tag]=(closeCounts[tag]||0)+1; } });
+  for(const tag in openCounts){
+    if((closeCounts[tag]||0) < openCounts[tag]) issues.push(`Looks like a <${tag}> tag might be missing its closing </${tag}>.`);
+  }
+  const openBraces = (css.match(/{/g)||[]).length;
+  const closeBraces = (css.match(/}/g)||[]).length;
+  if(openBraces !== closeBraces) issues.push(`Your CSS has ${openBraces} "{" but ${closeBraces} "}" — check for a missing brace.`);
+  if(css.trim() && !/[;{}]\s*$/.test(css.trim())) issues.push('Check that your last CSS line ends with a semicolon `;`.');
+  if(!html.trim()) issues.push('Your HTML editor is empty — add some tags to see a preview.');
+  if(issues.length===0) return "I checked your HTML and CSS and didn't spot any obvious tag or bracket mistakes. If something still looks wrong, tell me exactly what you expected vs what you're seeing.";
+  return "Here's what I noticed:\n" + issues.map(i=>'• '+i).join('\n');
+}
+
+function localRoboAnswer(question){
+  const lower = question.toLowerCase();
+  const debugWords = ['check','fix','wrong','error','not work','issue','debug','mistake','why is','why isn'];
+  if(debugWords.some(w=>lower.includes(w))) return runDiagnostics();
+  const kbAnswer = matchKnowledgeBase(question);
+  if(kbAnswer) return kbAnswer;
+  return "I don't have a ready example for that specific word yet. Robo (offline) knows: table, form, list, image, link, button, center, flexbox, grid, color, background, border, margin/padding, font, animation, marquee, video, audio, iframe, header, footer, nav, section, article, aside, blockquote, pre/code, hr, bold, italic, details, progress, select, textarea, label, fieldset, canvas, div vs span, id vs class. Try one of those, or say \"check my code\" for a review.";
+}
+function openRobo(){
+  openModal('roboModal');
+  const chat = document.getElementById('roboChat');
+  if(!chat.dataset.greeted){
+    addRoboMsg('bot', "Hi! I'm Robo 🤖 — I work fully offline. Ask me for an example (like \"sample HTML table\") and I'll give you real code, or say \"check my code\" and I'll review what you've written.");
+    chat.dataset.greeted = '1';
+  }
+}
+const roboCodeStore = {};
+let roboCodeCounter = 0;
+function escapeHtmlText(s){ return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function renderRoboContent(text){
+  // Split on fenced code blocks ```lang ... ```
+  const parts = text.split(/```(html|css)?\n?([\s\S]*?)```/g);
+  let html = '';
+  for(let i=0;i<parts.length;i+=3){
+    const plain = parts[i] || '';
+    if(plain.trim()) html += `<div>${escapeHtmlText(plain.trim())}</div>`;
+    const lang = parts[i+1];
+    const code = parts[i+2];
+    if(code !== undefined){
+      const id = 'rc'+(roboCodeCounter++);
+      roboCodeStore[id] = {lang: lang||'html', code};
+      html += `<pre>${escapeHtmlText(code.trim())}</pre>
+        <div class="code-actions">
+          <button class="btn" onclick="loadRoboCode('${id}')">⤵ Load into ${lang==='css'?'CSS':'HTML'} editor</button>
+        </div>`;
+    }
+  }
+  return html || escapeHtmlText(text);
+}
+function loadRoboCode(id){
+  const item = roboCodeStore[id];
+  if(!item) return;
+  if(item.lang === 'css'){ elCss.value = item.code.trim(); switchTab('css'); }
+  else { elHtml.value = item.code.trim(); switchTab('html'); }
+  updateGutter(); runPreview();
+}
+function addRoboMsg(who, text){
+  const chat = document.getElementById('roboChat');
+  const div = document.createElement('div');
+  div.className = 'robo-msg ' + who;
+  if(who === 'user') div.textContent = text;
+  else div.innerHTML = renderRoboContent(text);
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  return div;
+}
+function askRoboQuick(q){
+  document.getElementById('roboInput').value = q;
+  askRobo();
+}
+async function askRobo(){
+  const input = document.getElementById('roboInput');
+  const question = input.value.trim();
+  if(!question) return;
+  addRoboMsg('user', question);
+  input.value = '';
+  const thinkingEl = addRoboMsg('bot thinking', 'Robo is thinking...');
+
+  const sample = await getRobo();
+  if(!sample){
+    // Offline mode: answer instantly using the built-in knowledge base / diagnostics
+    const answer = localRoboAnswer(question);
+    thinkingEl.innerHTML = renderRoboContent(answer);
+    thinkingEl.classList.remove('thinking');
+    document.getElementById('roboChat').scrollTop = document.getElementById('roboChat').scrollHeight;
+    return;
+  }
+
+  const prompt = `You are "Robo", a friendly beginner-friendly HTML/CSS tutor bot inside a student coding IDE for Shree Binayak Computer Learning Centre.
+
+There are two kinds of student requests, answer differently depending on which this is:
+1. DEBUG/FIX requests about the student's OWN code (e.g. "why isn't my CSS applying", "check my code for mistakes") — give a short HINT only (2-4 sentences), do NOT rewrite their code, guide them to find the fix themselves.
+2. EXAMPLE/SAMPLE/TEACH requests (e.g. "give me a sample HTML table", "how do I center a div", "show me a form example") — these are legitimate learning requests, so DO provide a short, complete, working code example. Put HTML in a fenced block starting with \`\`\`html and CSS in one starting with \`\`\`css. Keep the example minimal (under ~15 lines) and add one short sentence explaining it. It is fine to give full working code here.
+
+Use simple language for a beginner student. Decide which of the two cases this is from the question below.
+
+Student's current HTML:
+---
+${elHtml.value.slice(0,1500)}
+---
+Student's current CSS:
+---
+${elCss.value.slice(0,1500)}
+---
+Student's question: ${question}`;
+
+  try{
+    const result = await sample(prompt, {
+      onText: ({text}) => { thinkingEl.textContent = text; thinkingEl.classList.remove('thinking'); }
+    });
+    const finalText = result.text || "I couldn't come up with an answer that time — try rephrasing your question.";
+    thinkingEl.innerHTML = renderRoboContent(finalText);
+    thinkingEl.classList.remove('thinking');
+    document.getElementById('roboChat').scrollTop = document.getElementById('roboChat').scrollHeight;
+  }catch(e){
+    const answer = localRoboAnswer(question);
+    thinkingEl.innerHTML = renderRoboContent(answer);
+    thinkingEl.classList.remove('thinking');
+  }
+}
+
+// Splash: logo grows slowly, then the app opens (tap to skip)
+$('splashLogo').src=document.querySelector('header .logo').src;
+function hideSplash(){ const s=$('splash'); if(!s) return; s.classList.add('hide'); setTimeout(()=>s.remove(),800); }
+$('splash').addEventListener('click',hideSplash);
+setTimeout(hideSplash,4200);
+init();
+</script>
+</body>
+</html>
