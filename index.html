@@ -47,6 +47,11 @@ header{position:relative;flex-shrink:0;z-index:var(--z-header);background:var(--
 .cp-item.sel,.cp-item:hover{background:var(--accent);color:#fff}
 .health-ok{color:var(--accent2)}.health-warn{color:#eab308}.health-err{color:var(--danger)}
 .health-item{padding:.35rem 0;border-bottom:1px solid var(--border);font-size:.85rem;cursor:pointer}
+.live-btn{display:flex;align-items:center;gap:.35rem;background:rgba(239,68,68,.12);border:1px solid var(--danger);color:var(--danger);border-radius:999px;padding:.2rem .6rem;font-size:.68rem;font-weight:700;letter-spacing:.04em;cursor:pointer}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--danger);box-shadow:0 0 0 0 rgba(239,68,68,.6);animation:liveBlink 1.4s infinite}
+@keyframes liveBlink{0%{box-shadow:0 0 0 0 rgba(239,68,68,.55)}70%{box-shadow:0 0 0 7px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
+.live-btn.paused{background:rgba(148,163,184,.12);border-color:var(--muted);color:var(--muted)}
+.live-btn.paused .live-dot{background:var(--muted);animation:none;box-shadow:none}
 @media (max-width:720px){.menu-dd.wide{min-width:260px}}
 .brand{display:flex;align-items:center;gap:.6rem;margin-right:auto;min-width:0}
 .logo{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid #d4af37;box-shadow:0 0 0 1px var(--border)}
@@ -70,7 +75,7 @@ main{display:flex;flex:1;min-height:0;overflow:hidden}
 .attr-suggest.show{display:flex}
 .attr-chip{background:var(--code-bg);border:1px solid var(--border);color:var(--accent);font:11px ui-monospace,monospace;padding:.15rem .45rem;border-radius:5px;cursor:pointer}
 .attr-chip:hover{border-color:var(--accent)}
-.attr-suggest::before{content:"↑↓ move · Tab ⇥ fill";font-size:.65rem;color:var(--muted);align-self:center;margin-right:.2rem;white-space:nowrap}
+.attr-suggest::before{content:"Alt+↑↓ move · Tab ⇥ fill";font-size:.65rem;color:var(--muted);align-self:center;margin-right:.2rem;white-space:nowrap}
 .grp{display:flex;gap:.3rem;padding-right:.5rem;border-right:1px solid var(--border)}
 .grp:last-child{border-right:none;padding-right:0}
 .toolbar{align-items:center}
@@ -295,6 +300,7 @@ footer{text-align:center;font-size:.72rem;color:var(--muted);padding:.6rem;borde
   <div class="panel" id="previewPanel" style="width:50%">
     <div class="panel-head">
       <strong style="font-size:.8rem">Live Preview</strong>
+      <button class="live-btn" id="liveBtn" onclick="toggleLive()" title="Click to pause or resume the live preview"><span class="live-dot"></span><span id="liveLabel">LIVE</span></button>
       <button class="btn" style="margin-left:auto" onclick="runPreview()">↻ Refresh</button>
     </div>
     <iframe id="preview" sandbox="allow-scripts"></iframe>
@@ -461,6 +467,7 @@ function init(){
   applyFontSize(safeGet('binayak_fontsize',13));
   if(wordWrapOn) document.querySelectorAll('textarea.code').forEach(el=>el.style.whiteSpace='pre-wrap');
   const arLabel='Auto Run: '+(autoRunOn?'ON':'OFF'); if($('autoRunItem'))$('autoRunItem').textContent=arLabel; if($('autoRunItem2'))$('autoRunItem2').textContent=arLabel;
+  updateLiveBtn();
   if($('autoSaveItem')) $('autoSaveItem').textContent='Auto Save: '+(autoSaveOn?'ON':'OFF');
   setInterval(()=>{ if(autoSaveOn && currentProjectId){ saveProject(); } }, 30000);
 }
@@ -499,7 +506,9 @@ function updateGutter(){
     document.getElementById('gutter').scrollTop = el.scrollTop;
   });
   el.addEventListener('keydown', e=>{
-    if((e.key==='ArrowDown'||e.key==='ArrowUp') && $('attrSuggest').classList.contains('show')){ e.preventDefault(); moveSuggest(e.key==='ArrowDown'?1:-1); return; }
+    // Plain Up/Down must always move the cursor normally. Only Alt+Up/Down cycles suggestion chips,
+    // so the chip bar being open never blocks normal line-to-line navigation.
+    if(e.altKey && (e.key==='ArrowDown'||e.key==='ArrowUp') && $('attrSuggest').classList.contains('show')){ e.preventDefault(); moveSuggest(e.key==='ArrowDown'?1:-1); return; }
     if(e.key==='Escape' && $('attrSuggest').classList.contains('show')){ $('attrSuggest').classList.remove('show'); return; }
     if(e.key==='Tab'){ e.preventDefault(); if(!e.shiftKey && tabAutofill()) return;
       const s=el.selectionStart, en=el.selectionEnd;
@@ -595,6 +604,20 @@ function toggleAutoRun(){
   closeMenus();
 }
 function stopPreview(){ document.getElementById('preview').srcdoc='<p style="font-family:sans-serif;padding:20px;color:#888">Preview stopped. Click Run to resume.</p>'; }
+// Red = live (auto-updates as you type), grey = paused (only updates when you press Run)
+function toggleLive(){
+  autoRunOn = !autoRunOn; safeSet('binayak_autorun', autoRunOn);
+  const label='Auto Run: '+(autoRunOn?'ON':'OFF');
+  if($('autoRunItem')) $('autoRunItem').textContent=label;
+  if($('autoRunItem2')) $('autoRunItem2').textContent=label;
+  updateLiveBtn();
+  if(autoRunOn) runPreview();
+}
+function updateLiveBtn(){
+  const b=$('liveBtn'); if(!b) return;
+  b.classList.toggle('paused', !autoRunOn);
+  $('liveLabel').textContent = autoRunOn ? 'LIVE' : 'PAUSED';
+}
 
 // ---- Settings: font size, word wrap, auto-save, reset ----
 function cmdFontSize(){
